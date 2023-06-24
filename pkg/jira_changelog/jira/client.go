@@ -10,28 +10,28 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-type client struct {
+type Client struct {
 	config     Config
 	httpClient *http.Client
 }
 
 type Issue struct {
-	Id     string `json:"id"`
-	Key    string `json:"key"`
+	Id  string `json:"id"`
+	Key string `json:"key"`
 }
 
-func (c *client) setupClient() {
+func (c *Client) setupClient() {
 	c.httpClient = &http.Client{
 		Timeout: 5 * time.Second,
 	}
 }
 
-func (c *client) attachDefaultHeaders(r *http.Request) {
+func (c *Client) attachDefaultHeaders(r *http.Request) {
 	r.Header.Add("Accept", "application/json")
 	r.SetBasicAuth(c.config.User, c.config.ApiToken)
 }
 
-func (c *client) FetchIssue(issueId string) (*Issue, error) {
+func (c *Client) FetchIssue(issueId string) (*Issue, error) {
 	requestUrl, err := url.JoinPath(c.config.BaseUrl, "rest", "api", "3", "issue", issueId)
 	slog.Debug("Preparing fetch request", "url", requestUrl)
 	if err != nil {
@@ -62,8 +62,8 @@ func (c *client) FetchIssue(issueId string) (*Issue, error) {
 	return &issue, nil
 }
 
-func NewClient(config Config) *client {
-	c := &client{config: config}
+func NewClient(config Config) *Client {
+	c := &Client{config: config}
 	c.setupClient()
 	return c
 }

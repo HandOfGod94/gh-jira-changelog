@@ -7,19 +7,27 @@ import (
 
 type Changelog struct {
 	JiraConfig jira.Config
-	FromRef    string
-	ToRef      string
+	fromRef    string
+	toRef      string
+	client     *jira.Client
 }
 
 func (c Changelog) Generate() {
-
-	slog.Info("Fetching issues from jira")
-	client := jira.NewClient(c.JiraConfig)
-	issue, err := client.FetchIssue("random-id") // TODO: use correct id
+	issue, err := c.client.FetchIssue("random-id") // TODO: use correct id
 	if err != nil {
 		slog.Error("failed while fetching issues from jira", "error", err)
 		panic(err)
 	}
 
 	slog.Info("Fetched issue", "issue", issue)
+}
+
+func NewChangelog(jiraConfig jira.Config, fromRef, toRef string) *Changelog {
+	client := jira.NewClient(jiraConfig)
+	return &Changelog{
+		jiraConfig,
+		fromRef,
+		toRef,
+		client,
+	}
 }
