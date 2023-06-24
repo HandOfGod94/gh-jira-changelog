@@ -5,14 +5,14 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-type Changelog struct {
+type Generator struct {
 	JiraConfig jira.Config
 	fromRef    string
 	toRef      string
 	client     *jira.Client
 }
 
-func (c Changelog) Generate() {
+func (c Generator) Generate() {
 	issue, err := c.client.FetchIssue("random-id") // TODO: use correct id
 	if err != nil {
 		slog.Error("failed while fetching issues from jira", "error", err)
@@ -22,9 +22,9 @@ func (c Changelog) Generate() {
 	slog.Info("Fetched issue", "issue", issue)
 }
 
-func NewChangelog(jiraConfig jira.Config, fromRef, toRef string) *Changelog {
+func NewGenerator(jiraConfig jira.Config, fromRef, toRef string) *Generator {
 	client := jira.NewClient(jiraConfig)
-	return &Changelog{
+	return &Generator{
 		jiraConfig,
 		fromRef,
 		toRef,
