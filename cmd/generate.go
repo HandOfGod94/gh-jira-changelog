@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	jira "github.com/handofgod94/jira_changelog/pkg/jira_changelog"
+	"github.com/handofgod94/jira_changelog/pkg/jira_changelog"
+	"github.com/handofgod94/jira_changelog/pkg/jira_changelog/jira"
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/slog"
 )
@@ -15,12 +16,17 @@ var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generates changelog",
 	Run: func(cmd *cobra.Command, args []string) {
-		changelog := jira.Changelog{
-			JiraConfig: jira.JiraConfig{ProjectUrl: projectUrl, ProjectName: projectName, ApiToken: apiToken},
-			GitConfig:  jira.GitConfig{FromRef: fromRef, ToRef: toRef},
+		changelog := jira_changelog.Changelog{
+			JiraConfig: jira.Config{ProjectUrl: projectUrl, ProjectName: projectName, ApiToken: apiToken},
+			FromRef:    fromRef,
+			ToRef:      toRef,
 		}
-		slog.Info("Generating changelog", "Jira Config", changelog.JiraConfig, "Git Config", changelog.GitConfig)
+
+		slog.Info("Generating changelog", "JiraConfig", changelog.JiraConfig,
+			"From", changelog.FromRef, "To", changelog.ToRef)
 		changelog.Generate()
+
+		slog.Info("Successfully generated")
 	},
 }
 
