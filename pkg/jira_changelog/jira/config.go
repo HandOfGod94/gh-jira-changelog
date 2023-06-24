@@ -1,7 +1,8 @@
 package jira
 
 type Config struct {
-	ProjectUrl  string
+	BaseUrl     string
 	ProjectName string
+	User        string
 	ApiToken    string
 }

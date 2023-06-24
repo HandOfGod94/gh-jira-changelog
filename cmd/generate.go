@@ -17,7 +17,7 @@ var generateCmd = &cobra.Command{
 	Short: "Generates changelog",
 	Run: func(cmd *cobra.Command, args []string) {
 		changelog := jira_changelog.Changelog{
-			JiraConfig: jira.Config{ProjectUrl: projectUrl, ProjectName: projectName, ApiToken: apiToken},
+			JiraConfig: jira.Config{BaseUrl: baseUrl, ProjectName: projectName, ApiToken: apiToken, User: emailId},
 			FromRef:    fromRef,
 			ToRef:      toRef,
 		}
