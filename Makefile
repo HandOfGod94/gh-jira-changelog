@@ -1,4 +1,4 @@
-APP_NAME=jira-changelog
+APP_NAME=jira_changelog
 
 all: clean fmt tidy build install
 
