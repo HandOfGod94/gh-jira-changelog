@@ -16,8 +16,15 @@ type Client struct {
 }
 
 type Issue struct {
-	Id  string `json:"id"`
-	Key string `json:"key"`
+	Id     string `json:"id"`
+	Key    string `json:"key"`
+	Fields struct {
+		Parent struct {
+			Fields struct {
+				Summary string `json:"summary"`
+			} `json:"fields,omitempty"`
+		} `json:"parent,omitempty"`
+	} `json:"fields"`
 }
 
 func (c *Client) setupClient() {
