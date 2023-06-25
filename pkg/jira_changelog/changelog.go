@@ -20,7 +20,6 @@ type Changelog struct {
 
 func (c *Changelog) Render(w io.Writer) {
 	slog.Info("rendering changelog")
-	fmt.Printf("Template content %v\n", changeLogTmpl)
 	tmpl, err := template.ParseFS(changeLogTmpl, "templates/changelog.tmpl")
 	if err != nil {
 		slog.Error("error parsing template", "error", err)

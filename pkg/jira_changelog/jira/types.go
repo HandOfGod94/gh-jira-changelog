@@ -32,25 +32,10 @@ type Issue struct {
 }
 
 func NewIssue(key, summary string) Issue {
-	// TODO: simplify this
-	return Issue{
-		Key: key,
-		Fields: struct {
-			Parent struct {
-				Fields struct {
-					Summary string `json:"summary"`
-				} `json:"fields"`
-			} `json:"parent"`
-			Status struct {
-				StatusCategory struct {
-					Key string `json:"key"`
-				} `json:"statusCategory"`
-			} `json:"status"`
-			Summary string `json:"summary"`
-		}{
-			Summary: summary,
-		},
-	}
+	issues := &Issue{}
+	issues.Key = key
+	issues.Fields.Summary = summary
+	return *issues
 }
 
 func (i Issue) IsWip() bool {

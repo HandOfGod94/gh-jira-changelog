@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"net/url"
+	"os"
 	"strings"
 
 	"github.com/handofgod94/jira_changelog/pkg/jira_changelog"
@@ -50,8 +52,25 @@ var generateCmd = &cobra.Command{
 
 		slog.Info("Generating changelog", "JiraConfig", changelog.JiraConfig,
 			"From", fromRef, "To", toRef)
-		changelog.Generate().Render(writeTo)
+		changelog.Generate().Render(writer(writeTo))
 	},
+}
+
+func writer(writeTo string) io.Writer {
+	switch writeTo {
+	case "/dev/stdout":
+		return os.Stdout
+	case "/dev/stderr":
+		return os.Stderr
+	default:
+		file, err := os.Create(writeTo)
+		if err != nil {
+			slog.Error("error creating output file", "error", err)
+			panic(err)
+		}
+		return file
+
+	}
 }
 
 func init() {
