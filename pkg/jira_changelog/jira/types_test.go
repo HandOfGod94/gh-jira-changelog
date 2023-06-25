@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFromCommitMessage(t *testing.T) {
+func TestIssueId(t *testing.T) {
 	testCases := []struct {
 		desc          string
 		commitMessage git.CommitMessage
@@ -42,7 +42,7 @@ func TestFromCommitMessage(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			got := jira.FromCommitMessage("TEST", tc.commitMessage)
+			got := jira.IssueId("TEST", tc.commitMessage)
 			assert.Equal(t, tc.want, got)
 		})
 	}

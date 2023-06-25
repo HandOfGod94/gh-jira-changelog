@@ -22,7 +22,7 @@ func (c Generator) Generate() {
 	slog.Debug("Total commit messages", "count", len(commitMessages))
 
 	jiraIssueIds := lo.Map(commitMessages, func(commitMessage git.CommitMessage, index int) jira.JiraIssueId {
-		return jira.FromCommitMessage(c.JiraConfig.ProjectName, commitMessage)
+		return jira.IssueId(c.JiraConfig.ProjectName, commitMessage)
 	})
 	jiraIssueIds = lo.Filter(jiraIssueIds, func(jiraIssueId jira.JiraIssueId, index int) bool { return jiraIssueId != "" })
 	jiraIssueIds = lo.Uniq(jiraIssueIds)

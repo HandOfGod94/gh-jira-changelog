@@ -35,7 +35,7 @@ func (i Issue) Epic() string {
 
 type JiraIssueId string
 
-func FromCommitMessage(projectName string, commitMessage git.CommitMessage) JiraIssueId {
+func IssueId(projectName string, commitMessage git.CommitMessage) JiraIssueId {
 	jiraIssuePattern := regexp.MustCompile("(\\[)?" + projectName + "-(\\d*)(\\])?.*")
 	result := jiraIssuePattern.FindStringSubmatch(string(commitMessage))
 	if len(result) == 0 {
