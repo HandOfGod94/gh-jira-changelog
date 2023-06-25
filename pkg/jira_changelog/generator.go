@@ -14,7 +14,7 @@ type Generator struct {
 	client     *jira.Client
 }
 
-func (c Generator) Generate() {
+func (c Generator) Generate() *Changelog {
 	commitMessages, err := git.CommitMessages(c.fromRef, c.toRef)
 	if err != nil {
 		panic(err)
@@ -41,6 +41,7 @@ func (c Generator) Generate() {
 
 	issuesByEpic := lo.GroupBy(issues, func(issue jira.Issue) string { return issue.Epic() })
 	slog.Debug("Issues grouped by epic", "issues", issuesByEpic)
+	return &Changelog{DoneChanges: issuesByEpic}
 }
 
 func NewGenerator(jiraConfig jira.Config, fromRef, toRef string) *Generator {

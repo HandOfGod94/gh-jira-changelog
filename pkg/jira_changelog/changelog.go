@@ -1,6 +1,37 @@
 package jira_changelog
 
-type EpicChangelog struct {
-	Epic    string
-	Summary []string
+import (
+	"bytes"
+	"embed"
+	"fmt"
+	"io"
+	"text/template"
+
+	"github.com/handofgod94/jira_changelog/pkg/jira_changelog/jira"
+	"golang.org/x/exp/slog"
+)
+
+//go:embed templates/*.tmpl
+var changeLogTmpl embed.FS
+
+type Changelog struct {
+	DoneChanges map[string][]jira.Issue
+}
+
+func (c *Changelog) Render(w io.Writer) {
+	slog.Info("rendering changelog")
+	fmt.Printf("Template content %v\n", changeLogTmpl)
+	tmpl, err := template.ParseFS(changeLogTmpl, "templates/changelog.tmpl")
+	if err != nil {
+		slog.Error("error parsing template", "error", err)
+		panic(err)
+	}
+
+	resultBuffer := bytes.NewBufferString("")
+	if err := tmpl.Execute(resultBuffer, c); err != nil {
+		slog.Error("error executing template", "error", err)
+		panic(err)
+	}
+
+	fmt.Fprint(w, resultBuffer.String())
 }

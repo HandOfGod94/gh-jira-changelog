@@ -16,6 +16,7 @@ import (
 var (
 	fromRef       string
 	toRef         string
+	writeTo       string
 	requiredFlags = []string{"base_url", "email_id", "api_token", "project_name"}
 )
 
@@ -49,15 +50,14 @@ var generateCmd = &cobra.Command{
 
 		slog.Info("Generating changelog", "JiraConfig", changelog.JiraConfig,
 			"From", fromRef, "To", toRef)
-		changelog.Generate()
-
-		slog.Info("Successfully generated")
+		changelog.Generate().Render(writeTo)
 	},
 }
 
 func init() {
 	generateCmd.Flags().StringVar(&fromRef, "from", "", "Git ref to start from")
 	generateCmd.Flags().StringVar(&toRef, "to", "main", "Git ref to end at")
+	generateCmd.Flags().StringVar(&writeTo, "write_to", "/dev/stdout", "File stream to write the changelog")
 
 	generateCmd.MarkFlagRequired("from")
 

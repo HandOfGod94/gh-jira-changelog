@@ -22,8 +22,39 @@ type Issue struct {
 				Summary string `json:"summary"`
 			} `json:"fields"`
 		} `json:"parent"`
+		Status struct {
+			StatusCategory struct {
+				Key string `json:"key"`
+			} `json:"statusCategory"`
+		} `json:"status"`
 		Summary string `json:"summary"`
 	} `json:"fields"`
+}
+
+func NewIssue(key, summary string) Issue {
+	// TODO: simplify this
+	return Issue{
+		Key: key,
+		Fields: struct {
+			Parent struct {
+				Fields struct {
+					Summary string `json:"summary"`
+				} `json:"fields"`
+			} `json:"parent"`
+			Status struct {
+				StatusCategory struct {
+					Key string `json:"key"`
+				} `json:"statusCategory"`
+			} `json:"status"`
+			Summary string `json:"summary"`
+		}{
+			Summary: summary,
+		},
+	}
+}
+
+func (i Issue) IsWip() bool {
+	return i.Fields.Status.StatusCategory.Key != "done"
 }
 
 func (i Issue) Epic() string {
