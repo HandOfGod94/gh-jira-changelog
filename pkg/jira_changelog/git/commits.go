@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+
+	"github.com/samber/lo"
 )
 
 type CommitMessage string
@@ -18,12 +20,9 @@ func CommitMessages(fromRef, toRef string) ([]CommitMessage, error) {
 	gitlogs := string(stdout)
 	gitlogs = strings.TrimSpace(gitlogs)
 
-	rawCommitMessages := strings.Split(gitlogs, "\n")
-	commitMessages := make([]CommitMessage, 0, len(rawCommitMessages))
-	for _, rawCommitMessage := range rawCommitMessages {
-		rawCommitMessage = strings.TrimSpace(rawCommitMessage)
-		commitMessages = append(commitMessages, CommitMessage(rawCommitMessage))
-		fmt.Println(rawCommitMessage)
-	}
+	commitMessages := lo.Map(strings.Split(gitlogs, "\n"), func(commitMessage string, index int) CommitMessage {
+		commitMessage = strings.TrimSpace(commitMessage)
+		return CommitMessage(commitMessage)
+	})
 	return commitMessages, nil
 }
