@@ -21,8 +21,7 @@ func CommitMessages(fromRef, toRef string) ([]CommitMessage, error) {
 	gitlogs = strings.TrimSpace(gitlogs)
 
 	commitMessages := lo.Map(strings.Split(gitlogs, "\n"), func(commitMessage string, index int) CommitMessage {
-		commitMessage = strings.TrimSpace(commitMessage)
-		return CommitMessage(commitMessage)
+		return CommitMessage(strings.TrimSpace(commitMessage))
 	})
 	return commitMessages, nil
 }
