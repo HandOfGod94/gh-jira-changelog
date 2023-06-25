@@ -2,20 +2,14 @@ package cmd
 
 import (
 	"fmt"
-	"net/url"
 	"os"
-	"strings"
 
-	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/exp/slog"
 )
 
-var (
-	cfgFile       string
-	requiredFlags = []string{"base_url", "email_id", "api_token", "project_name"}
-)
+var cfgFile string
 
 var rootCmd = &cobra.Command{
 	Use:   "jira_changelog",
@@ -23,17 +17,6 @@ var rootCmd = &cobra.Command{
 	Long: `Most of our changelog tools solely focus on commits. While the orgs usually use jira to track issues.
 When generating changelog why not combine both commits and jira issues to generate a changelog.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		unsetFlags := lo.Filter(requiredFlags, func(flag string, index int) bool { return !viper.IsSet(flag) })
-		if len(unsetFlags) > 0 {
-			unsetFlagsStr := strings.Join(unsetFlags, ", ")
-			return fmt.Errorf(`required flag "%s" not set`, unsetFlagsStr)
-		}
-
-		_, err := url.Parse(viper.GetString("base_url"))
-		if err != nil {
-			return err
-		}
-
 		var slogLevel slog.Level
 		switch viper.GetString("log_level") {
 		case "debug":

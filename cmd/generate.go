@@ -1,21 +1,41 @@
 package cmd
 
 import (
+	"fmt"
+	"net/url"
+	"strings"
+
 	"github.com/handofgod94/jira_changelog/pkg/jira_changelog"
 	"github.com/handofgod94/jira_changelog/pkg/jira_changelog/jira"
+	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/exp/slog"
 )
 
 var (
-	fromRef string
-	toRef   string
+	fromRef       string
+	toRef         string
+	requiredFlags = []string{"base_url", "email_id", "api_token", "project_name"}
 )
 
 var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generates changelog",
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		unsetFlags := lo.Filter(requiredFlags, func(flag string, index int) bool { return !viper.IsSet(flag) })
+		if len(unsetFlags) > 0 {
+			unsetFlagsStr := strings.Join(unsetFlags, ", ")
+			return fmt.Errorf(`required flag "%s" not set`, unsetFlagsStr)
+		}
+
+		_, err := url.Parse(viper.GetString("base_url"))
+		if err != nil {
+			return err
+		}
+
+		return nil
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		changelog := jira_changelog.NewGenerator(
 			jira.Config{
