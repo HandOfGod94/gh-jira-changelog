@@ -31,10 +31,11 @@ type Issue struct {
 	} `json:"fields"`
 }
 
-func NewIssue(key, summary string) Issue {
+func NewIssue(key, summary string, status string) Issue {
 	issues := &Issue{}
 	issues.Key = key
 	issues.Fields.Summary = summary
+	issues.Fields.Status.StatusCategory.Key = status
 	return *issues
 }
 

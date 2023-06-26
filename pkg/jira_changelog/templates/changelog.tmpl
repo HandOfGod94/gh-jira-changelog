@@ -1,10 +1,11 @@
 ## What has changed?
-{{ range $epic, $changes := .DoneChanges }}
+{{ range $epic, $changes := .Changes }}
 ### {{$epic}}
     {{- range $index, $change := $changes }}
+{{- if $change.IsWip }}
+- :warning: [{{$change.Key}}] {{$change.Fields.Summary -}}
+{{- else }}
 - [{{$change.Key}}] {{$change.Fields.Summary -}}
+{{- end -}}
     {{ end -}}
 {{ end }}
-
-## :warning: WIP
-### These cards are still in "done" state. Be careful while examining it

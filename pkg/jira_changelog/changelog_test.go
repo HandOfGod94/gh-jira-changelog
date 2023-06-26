@@ -18,10 +18,10 @@ func TestRender(t *testing.T) {
 		{
 			desc: "when there are `done` issues",
 			changelog: jira_changelog.Changelog{
-				DoneChanges: map[string][]jira.Issue{
+				Changes: map[string][]jira.Issue{
 					"TestEpic": {
-						jira.NewIssue("TEST-1", "foobar is new"),
-						jira.NewIssue("TEST-2", "fizzbuzz is something else"),
+						jira.NewIssue("TEST-1", "foobar is new", "done"),
+						jira.NewIssue("TEST-2", "fizzbuzz is something else", "done"),
 					},
 				},
 			},
@@ -30,14 +30,27 @@ func TestRender(t *testing.T) {
 ### TestEpic
 - [TEST-1] foobar is new
 - [TEST-2] fizzbuzz is something else
-
-## :warning: WIP
-### These cards are still in "done" state. Be careful while examining it
 `,
 		},
-		// {
-		// 	desc: "when there are `wip` issues",
-		// },
+		{
+			desc: "when there are `wip` issues",
+			changelog: jira_changelog.Changelog{
+				Changes: map[string][]jira.Issue{
+					"TestEpic": {
+						jira.NewIssue("TEST-1", "foobar is new", "done"),
+						jira.NewIssue("TEST-2", "fizzbuzz is something else", "in progress"),
+						jira.NewIssue("TEST-3", "fizzbuzz is something else", "done"),
+					},
+				},
+			},
+			want: `## What has changed?
+
+### TestEpic
+- [TEST-1] foobar is new
+- :warning: [TEST-2] fizzbuzz is something else
+- [TEST-3] fizzbuzz is something else
+`,
+		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

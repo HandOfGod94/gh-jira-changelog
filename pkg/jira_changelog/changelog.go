@@ -15,7 +15,7 @@ import (
 var changeLogTmpl embed.FS
 
 type Changelog struct {
-	DoneChanges map[string][]jira.Issue
+	Changes map[string][]jira.Issue
 }
 
 func (c *Changelog) Render(w io.Writer) {

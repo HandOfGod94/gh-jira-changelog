@@ -41,7 +41,7 @@ func (c Generator) Generate() *Changelog {
 
 	issuesByEpic := lo.GroupBy(issues, func(issue jira.Issue) string { return issue.Epic() })
 	slog.Debug("Issues grouped by epic", "issues", issuesByEpic)
-	return &Changelog{DoneChanges: issuesByEpic}
+	return &Changelog{Changes: issuesByEpic}
 }
 
 func NewGenerator(jiraConfig jira.Config, fromRef, toRef string) *Generator {
