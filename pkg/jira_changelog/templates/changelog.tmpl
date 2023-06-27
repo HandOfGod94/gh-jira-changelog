@@ -1,5 +1,6 @@
 ## What has changed?
-{{ range $epic, $changes := .Changes }}
+{{- range $epic, $changes := .Changes }}
+
 ### {{$epic}}
     {{- range $index, $change := $changes }}
 {{- if $change.IsWip }}

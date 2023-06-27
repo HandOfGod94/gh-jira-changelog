@@ -47,7 +47,7 @@ func (i Issue) Epic() string {
 	if i.Fields.Parent.Fields.Summary != "" {
 		return i.Fields.Parent.Fields.Summary
 	}
-	return ""
+	return "Miscellaneous"
 }
 
 type JiraIssueId string
