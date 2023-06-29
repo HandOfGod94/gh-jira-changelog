@@ -6,13 +6,6 @@ import (
 	"github.com/handofgod94/jira_changelog/pkg/jira_changelog/git"
 )
 
-type Config struct {
-	BaseUrl     string
-	ProjectName string
-	User        string
-	ApiToken    string
-}
-
 type Issue struct {
 	Id     string `json:"id"`
 	Key    string `json:"key"`
@@ -61,3 +54,4 @@ func IssueId(projectName string, commitMessage git.CommitMessage) JiraIssueId {
 	return JiraIssueId(projectName + "-" + result[2])
 
 }
+
