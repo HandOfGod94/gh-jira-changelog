@@ -6,4 +6,3 @@ type Config struct {
 	User        string
 	ApiToken    string
 }
-

@@ -1,8 +1,8 @@
 package jira_changelog
 
 import (
-	"github.com/handofgod94/jira_changelog/pkg/jira_changelog/git"
-	"github.com/handofgod94/jira_changelog/pkg/jira_changelog/jira"
+	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/git"
+	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira"
 	"github.com/samber/lo"
 	"golang.org/x/exp/slog"
 )

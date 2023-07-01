@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/handofgod94/jira_changelog/pkg/jira_changelog"
-	"github.com/handofgod94/jira_changelog/pkg/jira_changelog/jira"
+	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog"
+	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira"
 	"github.com/stretchr/testify/assert"
 )
 

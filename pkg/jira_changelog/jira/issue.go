@@ -3,7 +3,7 @@ package jira
 import (
 	"regexp"
 
-	"github.com/handofgod94/jira_changelog/pkg/jira_changelog/git"
+	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/git"
 )
 
 type Issue struct {
@@ -54,4 +54,3 @@ func IssueId(projectName string, commitMessage git.CommitMessage) JiraIssueId {
 	return JiraIssueId(projectName + "-" + result[2])
 
 }
-

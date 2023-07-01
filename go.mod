@@ -1,4 +1,4 @@
-module github.com/handofgod94/jira_changelog
+module github.com/handofgod94/gh-jira-changelog
 
 go 1.20
 
