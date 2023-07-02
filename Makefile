@@ -3,10 +3,10 @@ APP_NAME=gh-jira-changelog
 all: clean fmt tidy build install
 
 clean:
-	rm -rf out/
+	rm -f $(APP_NAME)
 
 install:
-	go install
+	gh extension install .
 
 quality-check:
 	staticcheck ./...
@@ -21,13 +21,13 @@ tidy:
 	go mod tidy -v
 
 run: dev
-	./out/$(APP_NAME)
+	$(APP_NAME)
 
 dev:
-	go build -v -o out/$(APP_NAME) main.go
+	go build -v -o ouAPP_NAME) main.go
 
 build:
-	go build -v -ldflags "-w" -o out/$(APP_NAME) main.go
+	go build -v -ldflags "-w" -o $(APP_NAME) main.go
 
 fmt:
 	go fmt ./...

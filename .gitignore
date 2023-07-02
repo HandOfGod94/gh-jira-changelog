@@ -3,3 +3,4 @@ coverage.out
 .vscode/
 dist/
 bin/
+gh-jira-changelog
