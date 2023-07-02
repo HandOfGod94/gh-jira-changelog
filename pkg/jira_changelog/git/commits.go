@@ -19,7 +19,7 @@ type Commit struct {
 
 type GitOutput string
 
-const gitoutputPattern = `^\((\d+)\)\s+(.*)`
+var gitoutputPattern = regexp.MustCompile(`^\((\d+)\)\s+(.*)`)
 
 func ExecGitLog(ctx context.Context, fromRef, toRef string) (GitOutput, error) {
 	cmd := exec.CommandContext(ctx, "git", "log", "--decorate-refs-exclude=refs/tags", "--pretty=(%ct) %d %s", "--no-merges", fromRef+".."+toRef)
@@ -58,8 +58,7 @@ func (gt GitOutput) Commits() ([]Commit, error) {
 
 func extractCommitMessage(gitlogLine string) (string, error) {
 	gitlogLine = strings.TrimSpace(gitlogLine)
-	re := regexp.MustCompile(gitoutputPattern)
-	result := re.FindStringSubmatch(gitlogLine)
+	result := gitoutputPattern.FindStringSubmatch(gitlogLine)
 	if len(result) < 3 {
 		return "", fmt.Errorf("couldn't find commit message in git log. %v", gitlogLine)
 	}
@@ -68,8 +67,7 @@ func extractCommitMessage(gitlogLine string) (string, error) {
 }
 
 func extractTime(gitlogLine string) (time.Time, error) {
-	re := regexp.MustCompile(gitoutputPattern)
-	result := re.FindStringSubmatch(gitlogLine)
+	result := gitoutputPattern.FindStringSubmatch(gitlogLine)
 	if len(result) < 2 {
 		return time.Time{}, fmt.Errorf("couldn't find timestamp in commit message. %v", gitlogLine)
 	}
