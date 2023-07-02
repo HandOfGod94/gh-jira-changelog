@@ -1,6 +1,8 @@
 package jira_changelog
 
 import (
+	"context"
+
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/git"
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira"
 	"github.com/samber/lo"
@@ -14,15 +16,23 @@ type Generator struct {
 	client     *jira.Client
 }
 
-func (c Generator) Generate() *Changelog {
-	commitMessages, err := git.CommitMessages(c.fromRef, c.toRef)
+func checkErr(err error) {
 	if err != nil {
 		panic(err)
 	}
-	slog.Debug("Total commit messages", "count", len(commitMessages))
+}
 
-	jiraIssueIds := lo.Map(commitMessages, func(commitMessage git.CommitMessage, index int) jira.JiraIssueId {
-		return jira.IssueId(c.JiraConfig.ProjectName, commitMessage)
+func (c Generator) Generate(ctx context.Context) *Changelog {
+	gitOutput, err := git.ExecGitLog(ctx, c.fromRef, c.toRef)
+	checkErr(err)
+
+	commits, err := gitOutput.Commits()
+	checkErr(err)
+
+	slog.Debug("Total commit messages", "count", len(commits))
+
+	jiraIssueIds := lo.Map(commits, func(commit git.Commit, index int) jira.JiraIssueId {
+		return jira.IssueId(c.JiraConfig.ProjectName, commit.Message)
 	})
 	jiraIssueIds = lo.Filter(jiraIssueIds, func(jiraIssueId jira.JiraIssueId, index int) bool { return jiraIssueId != "" })
 	jiraIssueIds = lo.Uniq(jiraIssueIds)

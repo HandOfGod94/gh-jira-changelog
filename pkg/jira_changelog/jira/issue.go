@@ -1,10 +1,6 @@
 package jira
 
-import (
-	"regexp"
-
-	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/git"
-)
+import "regexp"
 
 type Issue struct {
 	Id     string `json:"id"`
@@ -45,9 +41,9 @@ func (i Issue) Epic() string {
 
 type JiraIssueId string
 
-func IssueId(projectName string, commitMessage git.CommitMessage) JiraIssueId {
+func IssueId(projectName, commitMessage string) JiraIssueId {
 	jiraIssuePattern := regexp.MustCompile("(\\[)?" + projectName + "-(\\d*)(\\])?.*")
-	result := jiraIssuePattern.FindStringSubmatch(string(commitMessage))
+	result := jiraIssuePattern.FindStringSubmatch(commitMessage)
 	if len(result) == 0 {
 		return ""
 	}

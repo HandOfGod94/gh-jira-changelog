@@ -1,9 +1,11 @@
 APP_NAME=gh-jira-changelog
+EXTENSION_NAME=jira-changelog
 
 all: clean fmt tidy build install
 
 clean:
 	rm -f $(APP_NAME)
+	gh extension remove $(EXTENSION_NAME) &2>/dev/null; true
 
 install:
 	gh extension install .
@@ -32,3 +34,9 @@ build:
 fmt:
 	go fmt ./...
 	gofmt -s -w .
+
+setup-tools:
+	go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
+	go install github.com/uudashr/gocognit/cmd/gocognit@latest
+	go install honnef.co/go/tools/cmd/staticcheck@latest
+	go install github.com/mcubik/goverreport@latest

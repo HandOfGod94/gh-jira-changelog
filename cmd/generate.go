@@ -1,11 +1,13 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog"
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira"
@@ -16,10 +18,11 @@ import (
 )
 
 var (
-	fromRef       string
-	toRef         string
-	writeTo       string
-	requiredFlags = []string{"base_url", "email_id", "api_token", "project_name"}
+	fromRef        string
+	toRef          string
+	writeTo        string
+	requiredFlags  = []string{"base_url", "email_id", "api_token", "project_name"}
+	DefaultTimeout = 5 * time.Second
 )
 
 var generateCmd = &cobra.Command{
@@ -40,6 +43,9 @@ var generateCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		ctx, cancel := context.WithTimeout(context.Background(), DefaultTimeout)
+		defer cancel()
+
 		changelog := jira_changelog.NewGenerator(
 			jira.Config{
 				BaseUrl:     viper.GetString("base_url"),
@@ -52,7 +58,7 @@ var generateCmd = &cobra.Command{
 
 		slog.Info("Generating changelog", "JiraConfig", changelog.JiraConfig,
 			"From", fromRef, "To", toRef)
-		changelog.Generate().Render(writer(writeTo))
+		changelog.Generate(ctx).Render(writer(writeTo))
 	},
 }
 
