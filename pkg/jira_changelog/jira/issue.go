@@ -20,7 +20,7 @@ type Issue struct {
 	} `json:"fields"`
 }
 
-func NewIssue(key, summary string, status string) Issue {
+func NewIssue(key, summary, status string) Issue {
 	issues := &Issue{}
 	issues.Key = key
 	issues.Fields.Summary = summary
@@ -41,9 +41,9 @@ func (i Issue) Epic() string {
 
 type JiraIssueId string
 
-func IssueId(projectName, commitMessage string) JiraIssueId {
+func IssueId(projectName, text string) JiraIssueId {
 	jiraIssuePattern := regexp.MustCompile("(\\[)?" + projectName + "-(\\d*)(\\])?.*")
-	result := jiraIssuePattern.FindStringSubmatch(commitMessage)
+	result := jiraIssuePattern.FindStringSubmatch(text)
 	if len(result) == 0 {
 		return ""
 	}
