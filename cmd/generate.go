@@ -6,12 +6,10 @@ import (
 	"io"
 	"net/url"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog"
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira"
-	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/exp/slog"
@@ -21,7 +19,6 @@ var (
 	fromRef        string
 	toRef          string
 	writeTo        string
-	requiredFlags  = []string{"base_url", "email_id", "api_token", "project_name"}
 	DefaultTimeout = 5 * time.Second
 )
 
@@ -29,10 +26,10 @@ var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generates changelog",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		unsetFlags := lo.Filter(requiredFlags, func(flag string, index int) bool { return !viper.IsSet(flag) })
-		if len(unsetFlags) > 0 {
-			unsetFlagsStr := strings.Join(unsetFlags, ", ")
-			return fmt.Errorf(`required flag "%s" not set`, unsetFlagsStr)
+		apiToken := viper.GetString("api_token")
+		emailID := viper.GetString("email_id")
+		if apiToken != "" && emailID == "" {
+			return fmt.Errorf("valid email_id is required with api_token config")
 		}
 
 		_, err := url.Parse(viper.GetString("base_url"))
@@ -84,7 +81,16 @@ func init() {
 	generateCmd.Flags().StringVar(&toRef, "to", "main", "Git ref to end at")
 	generateCmd.Flags().StringVar(&writeTo, "write_to", "/dev/stdout", "File stream to write the changelog")
 
+	generateCmd.PersistentFlags().StringP("base_url", "u", "", "base url where jira is hosted")
+	generateCmd.PersistentFlags().String("email_id", "", "email id of the user")
+	generateCmd.PersistentFlags().StringP("api_token", "t", "", "API token for jira")
+	generateCmd.PersistentFlags().StringP("project_name", "p", "", "Project name in jira. usually the acronym")
+	generateCmd.PersistentFlags().StringP("log_level", "v", "error", "log level. options: debug, info, warn, error")
+
 	generateCmd.MarkFlagRequired("from")
+	generateCmd.MarkPersistentFlagRequired("base_url")
+	generateCmd.MarkPersistentFlagRequired("project_name")
 
 	rootCmd.AddCommand(generateCmd)
+	viper.BindPFlags(generateCmd.PersistentFlags())
 }
