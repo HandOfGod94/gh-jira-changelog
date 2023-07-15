@@ -22,7 +22,7 @@ jobs:
     - name: Run cyclometric complexity check
       run: |
         gocyclo -avg .
-        gocyclo -over 15
+        gocyclo -over 15 .
     - name: Run cognitive complexity check
       run: |
         gocognit -avg .
