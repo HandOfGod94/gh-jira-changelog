@@ -8,6 +8,7 @@ clean:
 	gh extension remove $(EXTENSION_NAME) &2>/dev/null; true
 
 install:
+	go install
 	gh extension install .
 
 quality-check:
