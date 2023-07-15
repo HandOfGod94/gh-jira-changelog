@@ -3,24 +3,24 @@
 `gh` cli plugin to generate changelog from jira
 
 ## Content
-* [Installation](#installation)
-* [Verify installation](#verify-installation)
-* [Usage](#usage)
-  * [Generating Changelog](#generating-changelog)
+  * [Installation](#installation)
+  * [Verify installation](#verify-installation)
+  * [Usage](#usage)
+    * [Generating Changelog](#generating-changelog)
 
 
-## Installation
+### Installation
 
 WIP
 
-## Verify installation
+### Verify installation
 
 `$ gh-jira-changelog version`
 ```
 v0.1.0
 ```
 
-## Usage
+### Usage
 
 `$ gh-jira-changelog --help`
 ```
@@ -46,7 +46,7 @@ Flags:
 Use "gh-jira-changelog [command] --help" for more information about a command.
 ```
 
-### Generating Changelog
+#### Generating Changelog
 
 `$ gh-jira-changelog generate --help`
 ```
