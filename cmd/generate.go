@@ -25,6 +25,30 @@ var (
 var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generates changelog",
+	Example: `#using as a standalone tool
+gh-jira-changelog generate \
+	--base_url="<you-atlassian-url>" \
+	--project_name="<jira-project-name>" \
+	--from="<git-ref>" \
+	--to="<git-ref>" \
+	--api_token="<jira-api-token>" \
+	--email_id="jira-email-id"
+
+# using config file
+# all the jira config such as (base_url, project_name, api_token, email_id) can be stored in a config file
+gh-jira-changelog generate --config="<path-to-config-file>.yaml" --from=<git-ref> --to=<git-ref>
+
+# using env variables
+# all the jira config such as (base_url, project_name, api_token, email_id) can be provided by env variables
+BASE_URL=<you-atlassian-url> PROJECT_NAME=<jira-project-name> API_TOKEN=<jira-api-token> gh-jira-changelog generate --from=<git-ref> --to=<git-ref>
+
+# generating changelog between 2 git tags
+gh-jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0" --to="v0.2.0"
+
+
+# Using it as GH plugin
+# assuming jira plugin installed
+gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0" --to="v0.2.0"`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		apiToken := viper.GetString("api_token")
 		emailID := viper.GetString("email_id")

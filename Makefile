@@ -40,3 +40,6 @@ setup-tools:
 	go install github.com/uudashr/gocognit/cmd/gocognit@latest
 	go install honnef.co/go/tools/cmd/staticcheck@latest
 	go install github.com/mcubik/goverreport@latest
+
+sync-docs:
+	mdsh

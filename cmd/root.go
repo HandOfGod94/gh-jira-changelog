@@ -12,10 +12,13 @@ import (
 var cfgFile string
 
 var rootCmd = &cobra.Command{
-	Use:   "jira_changelog",
+	Use:   "gh-jira-changelog",
 	Short: "Changelog generator using jira issues",
 	Long: `Most of our changelog tools solely focus on commits. While the orgs usually use jira to track issues.
-When generating changelog why not combine both commits and jira issues to generate a changelog.`,
+When generating changelog why not combine both commits and jira issues to generate a changelog.
+
+This can also work as a plugin for "gh" cli
+`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		var slogLevel slog.Level
 		switch viper.GetString("log_level") {
