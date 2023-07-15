@@ -3,6 +3,8 @@ on:
   push:
     tags:
       - '*'
+env:
+  HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.GORELEASER_TOKEN }}
 
 permissions:
   contents: write

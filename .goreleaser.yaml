@@ -30,6 +30,21 @@ archives:
       format: zip
 checksum:
   name_template: 'checksums.txt'
+brews:
+  - name: gh-jira-changelog
+    tap:
+      owner: handofgod94
+      name: homebrew-tap
+      branch: main
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    skip_upload: auto
+    commit_author:
+      name: Gahan Rakholia
+      email: gahan94rakh@gmail.com
+    commit_msg_template: 'Brew formula update for {{ .ProjectName }} version {{ .Tag }}'
+    homepage: 'https://github.com/HandOfGod94/gh-jira-changelog'
+    description: "Changelog generator using jira issues"
+    license: "Apache-2.0"
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
 changelog:
