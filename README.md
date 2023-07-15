@@ -4,6 +4,9 @@
 
 ## Content
   * [Installation](#installation)
+    * [Using gh cli, as extension](#using-gh-cli,-as-extension)
+    * [MacOS using `homebrew`](#macos-using-`homebrew`)
+    * [Go Toolchain](#go-toolchain)
   * [Verify installation](#verify-installation)
   * [Usage](#usage)
     * [Generating Changelog](#generating-changelog)
@@ -11,13 +14,32 @@
 
 ### Installation
 
-WIP
+Feel free to use any of the available methods
+
+#### Using gh cli, as extension
+```sh
+gh extension install handofgod94/gh-jira-changelog
+```
+
+> :warning: If you are using it as gh cli extension, ensure that you don't have `gh-jira-changelog` binary in PATH var.
+> In other words, don't install standalone binary, if you want to use it as `gh` extension.
+
+#### MacOS using `homebrew`
+```sh
+brew install handofgod94/tap/gh-jira-changelog
+```
+
+#### Go Toolchain
+```sh
+go install github.com/handofgod94/gh-jira-changelog@v0.1.1
+```
+The go binary will be installed in `$GOPATH/bin`
 
 ### Verify installation
 
 `$ gh-jira-changelog version`
 ```
-v0.1.0
+v0.1.2
 ```
 
 ### Usage
