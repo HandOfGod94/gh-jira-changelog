@@ -14,7 +14,7 @@ var authCmd = &cobra.Command{
 Note: It's recommended to use API token instead of authenticating with oauth from CLI,
 as Atlassian currently doesn't support PKCE verification for oauth flow.`,
 	ValidArgs: []string{"login", "logout"},
-	Args:      cobra.ExactValidArgs(1),
+	Args:      cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		switch args[0] {
 		case "login":
@@ -22,7 +22,7 @@ as Atlassian currently doesn't support PKCE verification for oauth flow.`,
 		case "logout":
 			fmt.Println("auth logout")
 		default:
-			return fmt.Errorf("Invalid argument %s", args[0])
+			return fmt.Errorf("invalid argument %s", args[0])
 		}
 		return nil
 	},

@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  lint-test-build:
 
     runs-on: ubuntu-latest
 
@@ -16,10 +16,18 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: 1.20
-    - name: Lint
+        go-version: '1.20'
+    - name: Install tools
+      run: make setup-tools
+    - name: Run cyclometric complexity check
       run: |
-        make setup-tools
+        gocyclo -avg .
+        gocyclo -over 15
+    - name: Run cognitive complexity check
+      run: |
+        gocognit -avg .
+        gocognit -over 15 .
+    - name: Run static check
         staticcheck ./...
     - name: Test
       run: go test -timeout 10s -count=1 -race ./...

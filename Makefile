@@ -1,7 +1,7 @@
 APP_NAME=gh-jira-changelog
 EXTENSION_NAME=jira-changelog
 
-all: clean fmt tidy build install
+all: clean fmt tidy quality-check build install
 
 clean:
 	rm -f $(APP_NAME)
@@ -12,7 +12,7 @@ install:
 
 quality-check:
 	staticcheck ./...
-	gocyclo -over 15 -ignore "testdata/" .
+	gocyclo -over 15 .
 	gocognit -over 15 .
 
 test:
