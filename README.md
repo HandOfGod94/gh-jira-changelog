@@ -2,6 +2,10 @@
 
 `gh` cli plugin to generate changelog from jira
 
+## Content
+* [Usage](#usage)
+  * [Generating Changelog](#generating-changelog)
+
 ## Usage
 
 `$ ./gh-jira-changelog --help`
