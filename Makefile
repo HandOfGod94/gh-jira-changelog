@@ -9,7 +9,7 @@ clean:
 
 install:
 	go install
-	gh extension install .
+	go build -o $(APP_NAME) && gh extension install .
 
 quality-check:
 	staticcheck ./...

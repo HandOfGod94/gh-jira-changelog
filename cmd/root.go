@@ -52,6 +52,11 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ./.jira_changelog.yaml)")
+	rootCmd.PersistentFlags().StringP("base_url", "u", "", "base url where jira is hosted")
+	rootCmd.PersistentFlags().String("email_id", "", "email id of the user")
+	rootCmd.PersistentFlags().StringP("api_token", "t", "", "API token for jira")
+	rootCmd.PersistentFlags().StringP("project_name", "p", "", "Project name in jira. usually the acronym")
+	rootCmd.PersistentFlags().StringP("log_level", "v", "error", "log level. options: debug, info, warn, error")
 
 	viper.BindPFlags(rootCmd.PersistentFlags())
 }

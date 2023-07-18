@@ -21,9 +21,6 @@ Feel free to use any of the available methods
 gh extension install handofgod94/gh-jira-changelog
 ```
 
-> :warning: If you are using it as gh cli extension, ensure that you don't have `gh-jira-changelog` binary in PATH var.
-> In other words, don't install standalone binary, if you want to use it as `gh` extension.
-
 #### MacOS using `homebrew`
 ```sh
 brew install handofgod94/tap/gh-jira-changelog
@@ -31,7 +28,7 @@ brew install handofgod94/tap/gh-jira-changelog
 
 #### Go Toolchain
 ```sh
-go install github.com/handofgod94/gh-jira-changelog@v0.1.3
+go install github.com/handofgod94/gh-jira-changelog@v0.1.4
 ```
 The go binary will be installed in `$GOPATH/bin`
 
@@ -39,7 +36,7 @@ The go binary will be installed in `$GOPATH/bin`
 
 `$ gh-jira-changelog version`
 ```
-v0.1.3
+v0.1.4
 ```
 
 ### Usage
@@ -62,8 +59,13 @@ Available Commands:
   version     Current version of generator
 
 Flags:
-      --config string   config file (default is ./.jira_changelog.yaml)
-  -h, --help            help for gh-jira-changelog
+  -t, --api_token string      API token for jira
+  -u, --base_url string       base url where jira is hosted
+      --config string         config file (default is ./.jira_changelog.yaml)
+      --email_id string       email id of the user
+  -h, --help                  help for gh-jira-changelog
+  -v, --log_level string      log level. options: debug, info, warn, error (default "error")
+  -p, --project_name string   Project name in jira. usually the acronym
 
 Use "gh-jira-changelog [command] --help" for more information about a command.
 ```
@@ -104,16 +106,16 @@ gh-jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0" --to="v0.2.0"
 
 Flags:
-  -t, --api_token string      API token for jira
-  -u, --base_url string       base url where jira is hosted
-      --email_id string       email id of the user
-      --from string           Git ref to start from
-  -h, --help                  help for generate
-  -v, --log_level string      log level. options: debug, info, warn, error (default "error")
-  -p, --project_name string   Project name in jira. usually the acronym
-      --to string             Git ref to end at (default "main")
-      --write_to string       File stream to write the changelog (default "/dev/stdout")
+      --from string       Git ref to start from
+  -h, --help              help for generate
+      --to string         Git ref to end at (default "main")
+      --write_to string   File stream to write the changelog (default "/dev/stdout")
 
 Global Flags:
-      --config string   config file (default is ./.jira_changelog.yaml)
+  -t, --api_token string      API token for jira
+  -u, --base_url string       base url where jira is hosted
+      --config string         config file (default is ./.jira_changelog.yaml)
+      --email_id string       email id of the user
+  -v, --log_level string      log level. options: debug, info, warn, error (default "error")
+  -p, --project_name string   Project name in jira. usually the acronym
 ```
