@@ -20,12 +20,13 @@ type Issue struct {
 	} `json:"fields"`
 }
 
-func NewIssue(key, summary, status string) Issue {
-	issues := &Issue{}
-	issues.Key = key
-	issues.Fields.Summary = summary
-	issues.Fields.Status.StatusCategory.Key = status
-	return *issues
+func NewIssue(key, summary, status, epic string) Issue {
+	issue := &Issue{}
+	issue.Key = key
+	issue.Fields.Summary = summary
+	issue.Fields.Status.StatusCategory.Key = status
+	issue.Fields.Parent.Fields.Summary = epic
+	return *issue
 }
 
 func (i Issue) IsWip() bool {
