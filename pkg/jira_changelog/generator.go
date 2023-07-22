@@ -2,7 +2,6 @@ package jira_changelog
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/git"
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira"
@@ -17,8 +16,7 @@ type Generator struct {
 	client     jira.Client
 }
 
-func panicIfErr(err error, args ...interface{}) {
-	slog.Error(err.Error(), args...)
+func panicIfErr(err error) {
 	if err != nil {
 		panic(err)
 	}
@@ -26,35 +24,51 @@ func panicIfErr(err error, args ...interface{}) {
 
 func (c Generator) Generate(ctx context.Context) *Changelog {
 	gitOutput, err := git.ExecGitLog(ctx, c.fromRef, c.toRef)
-	panicIfErr(fmt.Errorf("failed to execute git command. %w", err))
+	panicIfErr(err)
 
 	commits, err := gitOutput.Commits()
-	panicIfErr(fmt.Errorf("failed to parse git output. %w", err))
+	panicIfErr(err)
 
-	return c.changelogFromCommits(commits)
+	changelog, err := c.changelogFromCommits(commits)
+	panicIfErr(err)
+
+	return changelog
 }
 
-func (c Generator) changelogFromCommits(commits []git.Commit) *Changelog {
+func (c Generator) changelogFromCommits(commits []git.Commit) (*Changelog, error) {
 	slog.Debug("Total commit messages", "count", len(commits))
 
-	jiraIssueIds := lo.Map(commits, func(commit git.Commit, index int) jira.JiraIssueId {
-		return jira.IssueId(c.JiraConfig.ProjectName, commit.Message)
-	})
-	jiraIssueIds = lo.Filter(jiraIssueIds, func(jiraIssueId jira.JiraIssueId, index int) bool { return jiraIssueId != "" })
-	jiraIssueIds = lo.Uniq(jiraIssueIds)
-	slog.Debug("Total jira issues ids", "count", len(jiraIssueIds))
-
-	issues := lo.Map(jiraIssueIds, func(jiraIssueId jira.JiraIssueId, index int) jira.Issue {
-		issue, err := c.client.FetchIssue(string(jiraIssueId))
-		panicIfErr(fmt.Errorf("failed to fetch issue. %w", err), "issue", jiraIssueId)
+	jiraIssues := make([]jira.Issue, 0)
+	for _, commit := range commits {
+		issue, err := c.fetchJiraIssue(commit)
+		if err != nil {
+			slog.Error("error fetching jira issue", "error", err, "commit", commit)
+			return nil, err
+		}
 
 		slog.Debug("fetched issue", "issue", issue)
-		return issue
-	})
-	slog.Debug("Total issues", "count", len(issues))
+		jiraIssues = append(jiraIssues, issue)
+	}
 
-	issuesByEpic := lo.GroupBy(issues, func(issue jira.Issue) string { return issue.Epic() })
-	return &Changelog{Changes: issuesByEpic}
+	jiraIssues = lo.Uniq(jiraIssues)
+	slog.Debug("Total jira issues ids", "count", len(jiraIssues))
+
+	issuesByEpic := lo.GroupBy(jiraIssues, func(issue jira.Issue) string { return issue.Epic() })
+	return &Changelog{Changes: issuesByEpic}, nil
+}
+
+func (c Generator) fetchJiraIssue(commit git.Commit) (jira.Issue, error) {
+	issueId := jira.IssueId(c.JiraConfig.ProjectName, commit.Message)
+	if issueId == "" {
+		slog.Warn("commit message does not contain issue jira id of the project", "commit", commit, "project", c.JiraConfig.ProjectName)
+		return jira.NewIssue("", commit.Message, "done", ""), nil
+	}
+
+	issue, err := c.client.FetchIssue(string(issueId))
+	if err != nil {
+		return jira.Issue{}, err
+	}
+	return issue, nil
 }
 
 func NewGenerator(jiraConfig jira.Config, fromRef, toRef string) *Generator {
