@@ -28,7 +28,7 @@ brew install handofgod94/tap/gh-jira-changelog
 
 #### Go Toolchain
 ```sh
-go install github.com/handofgod94/gh-jira-changelog@v0.1.4
+go install github.com/handofgod94/gh-jira-changelog@latest
 ```
 The go binary will be installed in `$GOPATH/bin`
 
@@ -36,7 +36,7 @@ The go binary will be installed in `$GOPATH/bin`
 
 `$ gh-jira-changelog version`
 ```
-v0.1.4
+dev
 ```
 
 ### Usage
@@ -88,11 +88,11 @@ gh-jira-changelog generate \
 	--email_id="jira-email-id"
 
 # using config file
-# all the jira config such as (base_url, project_name, api_token, email_id) can be stored in a config file
+# all the jira config such as (base_url, api_token, email_id) can be stored in a config file
 gh-jira-changelog generate --config="<path-to-config-file>.yaml" --from=<git-ref> --to=<git-ref>
 
 # using env variables
-# all the jira config such as (base_url, project_name, api_token, email_id) can be provided by env variables
+# all the jira config such as (base_url, api_token, email_id) can be provided by env variables
 BASE_URL=<you-atlassian-url> API_TOKEN=<jira-api-token> gh-jira-changelog generate --from=<git-ref> --to=<git-ref>
 
 # generating changelog between 2 git tags
