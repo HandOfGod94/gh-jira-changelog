@@ -59,13 +59,12 @@ Available Commands:
   version     Current version of generator
 
 Flags:
-  -t, --api_token string      API token for jira
-  -u, --base_url string       base url where jira is hosted
-      --config string         config file (default is ./.jira_changelog.yaml)
-      --email_id string       email id of the user
-  -h, --help                  help for gh-jira-changelog
-  -v, --log_level string      log level. options: debug, info, warn, error (default "error")
-  -p, --project_name string   Project name in jira. usually the acronym
+  -t, --api_token string   API token for jira
+  -u, --base_url string    base url where jira is hosted
+      --config string      config file (default is ./.jira_changelog.yaml)
+      --email_id string    email id of the user
+  -h, --help               help for gh-jira-changelog
+  -v, --log_level string   log level. options: debug, info, warn, error (default "error")
 
 Use "gh-jira-changelog [command] --help" for more information about a command.
 ```
@@ -83,7 +82,6 @@ Examples:
 #using as a standalone tool
 gh-jira-changelog generate \
 	--base_url="<you-atlassian-url>" \
-	--project_name="<jira-project-name>" \
 	--from="<git-ref>" \
 	--to="<git-ref>" \
 	--api_token="<jira-api-token>" \
@@ -95,7 +93,7 @@ gh-jira-changelog generate --config="<path-to-config-file>.yaml" --from=<git-ref
 
 # using env variables
 # all the jira config such as (base_url, project_name, api_token, email_id) can be provided by env variables
-BASE_URL=<you-atlassian-url> PROJECT_NAME=<jira-project-name> API_TOKEN=<jira-api-token> gh-jira-changelog generate --from=<git-ref> --to=<git-ref>
+BASE_URL=<you-atlassian-url> API_TOKEN=<jira-api-token> gh-jira-changelog generate --from=<git-ref> --to=<git-ref>
 
 # generating changelog between 2 git tags
 gh-jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0" --to="v0.2.0"
@@ -112,10 +110,9 @@ Flags:
       --write_to string   File stream to write the changelog (default "/dev/stdout")
 
 Global Flags:
-  -t, --api_token string      API token for jira
-  -u, --base_url string       base url where jira is hosted
-      --config string         config file (default is ./.jira_changelog.yaml)
-      --email_id string       email id of the user
-  -v, --log_level string      log level. options: debug, info, warn, error (default "error")
-  -p, --project_name string   Project name in jira. usually the acronym
+  -t, --api_token string   API token for jira
+  -u, --base_url string    base url where jira is hosted
+      --config string      config file (default is ./.jira_changelog.yaml)
+      --email_id string    email id of the user
+  -v, --log_level string   log level. options: debug, info, warn, error (default "error")
 ```

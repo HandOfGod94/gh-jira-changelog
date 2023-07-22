@@ -41,7 +41,7 @@ func TestChangelogFromCommits(t *testing.T) {
 	mockedClient.On("FetchIssue", "TEST-1234").Return(jira.NewIssue("TEST-1234", "Ticket description", "done", "Epic1"), nil).Twice()
 	mockedClient.On("FetchIssue", "TEST-4546").Return(jira.NewIssue("TEST-4546", "Ticket description for 4546 issue", "done", "Epic2"), nil).Twice()
 	mockedClient.On("FetchIssue", "TEST-12345").Return(jira.NewIssue("TEST-12345", "Ticket description of another from same epic", "done", "Epic1"), nil)
-	generator := Generator{JiraConfig: jira.Config{ProjectName: "TEST"}}
+	generator := Generator{}
 	generator.client = mockedClient
 
 	result, err := generator.changelogFromCommits(commits)

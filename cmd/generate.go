@@ -22,7 +22,7 @@ var (
 	toRef          string
 	writeTo        string
 	DefaultTimeout = 5 * time.Second
-	requiredFlags  = []string{"base_url", "email_id", "api_token", "project_name"}
+	requiredFlags  = []string{"base_url", "email_id", "api_token"}
 )
 
 var generateCmd = &cobra.Command{
@@ -31,7 +31,6 @@ var generateCmd = &cobra.Command{
 	Example: `#using as a standalone tool
 gh-jira-changelog generate \
 	--base_url="<you-atlassian-url>" \
-	--project_name="<jira-project-name>" \
 	--from="<git-ref>" \
 	--to="<git-ref>" \
 	--api_token="<jira-api-token>" \
@@ -43,7 +42,7 @@ gh-jira-changelog generate --config="<path-to-config-file>.yaml" --from=<git-ref
 
 # using env variables
 # all the jira config such as (base_url, project_name, api_token, email_id) can be provided by env variables
-BASE_URL=<you-atlassian-url> PROJECT_NAME=<jira-project-name> API_TOKEN=<jira-api-token> gh-jira-changelog generate --from=<git-ref> --to=<git-ref>
+BASE_URL=<you-atlassian-url> API_TOKEN=<jira-api-token> gh-jira-changelog generate --from=<git-ref> --to=<git-ref>
 
 # generating changelog between 2 git tags
 gh-jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0" --to="v0.2.0"
@@ -78,10 +77,9 @@ gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 
 		changelog := jira_changelog.NewGenerator(
 			jira.Config{
-				BaseUrl:     viper.GetString("base_url"),
-				ProjectName: viper.GetString("project_name"),
-				ApiToken:    viper.GetString("api_token"),
-				User:        viper.GetString("email_id")},
+				BaseUrl:  viper.GetString("base_url"),
+				ApiToken: viper.GetString("api_token"),
+				User:     viper.GetString("email_id")},
 			fromRef,
 			toRef,
 		)
