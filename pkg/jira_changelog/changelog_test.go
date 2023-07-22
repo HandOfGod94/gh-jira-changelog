@@ -30,6 +30,8 @@ func TestRender(t *testing.T) {
 ### TestEpic
 - [TEST-1] foobar is new
 - [TEST-2] fizzbuzz is something else
+
+:warning: = Work in Progress. Ensure that these cards don't break things in production.
 `,
 		},
 		{
@@ -49,6 +51,8 @@ func TestRender(t *testing.T) {
 - [TEST-1] foobar is new
 - :warning: [TEST-2] fizzbuzz is something else
 - [TEST-3] fizzbuzz is something else
+
+:warning: = Work in Progress. Ensure that these cards don't break things in production.
 `,
 		},
 		{
@@ -78,6 +82,8 @@ func TestRender(t *testing.T) {
 - [TEST-4] foobar is new
 - [TEST-5] fizzbuzz is something else
 - [TEST-6] fizzbuzz is something else
+
+:warning: = Work in Progress. Ensure that these cards don't break things in production.
 `,
 		},
 	}
