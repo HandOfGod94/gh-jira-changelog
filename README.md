@@ -28,7 +28,7 @@ brew install handofgod94/tap/gh-jira-changelog
 
 #### Go Toolchain
 ```sh
-go install github.com/handofgod94/gh-jira-changelog@latest
+go install github.com/handofgod94/gh-jira-changelog@v0.2.0
 ```
 The go binary will be installed in `$GOPATH/bin`
 
@@ -36,7 +36,7 @@ The go binary will be installed in `$GOPATH/bin`
 
 `$ gh-jira-changelog version`
 ```
-dev
+v0.2.0
 ```
 
 ### Usage
