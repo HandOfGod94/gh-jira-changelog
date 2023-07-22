@@ -1,6 +1,11 @@
 package jira
 
-import "regexp"
+import (
+	"fmt"
+	"regexp"
+)
+
+const jiraIssuePattern = `^\[(?P<projectName>[A-Z]+)-(?P<issueId>\d+)\].*`
 
 type Issue struct {
 	Id     string `json:"id"`
@@ -42,12 +47,14 @@ func (i Issue) Epic() string {
 
 type JiraIssueId string
 
-func IssueId(projectName, text string) JiraIssueId {
-	jiraIssuePattern := regexp.MustCompile("(\\[)?" + projectName + "-(\\d*)(\\])?.*")
-	result := jiraIssuePattern.FindStringSubmatch(text)
+func IssueId(text string) JiraIssueId {
+	re := regexp.MustCompile(jiraIssuePattern)
+	result := re.FindStringSubmatch(text)
 	if len(result) == 0 {
 		return ""
 	}
-	return JiraIssueId(projectName + "-" + result[2])
+	projectNameIdx := re.SubexpIndex("projectName")
+	issueIdIdx := re.SubexpIndex("issueId")
+	return JiraIssueId(fmt.Sprintf("%s-%s", result[projectNameIdx], result[issueIdIdx]))
 
 }

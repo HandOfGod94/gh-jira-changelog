@@ -31,8 +31,8 @@ func TestChangelogFromCommits(t *testing.T) {
 				jira.NewIssue("TEST-4546", "Ticket description for 4546 issue", "done", "Epic2"),
 			},
 			"Miscellaneous": {
-				jira.NewIssue("", "[NO-CARD] commit message random", "done", ""),
-				jira.NewIssue("", "foobar commit message random", "done", ""),
+				jira.NewIssue("", "[NO-CARD] commit message random (3245vw)", "done", ""),
+				jira.NewIssue("", "foobar commit message random (3245vw)", "done", ""),
 			},
 		},
 	}

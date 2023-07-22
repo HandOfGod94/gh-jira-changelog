@@ -5,8 +5,12 @@
     {{- range $index, $change := $changes }}
 {{- if $change.IsWip }}
 - :warning: [{{$change.Key}}] {{$change.Fields.Summary -}}
+{{- else if eq $change.Key "" }}
+- {{$change.Fields.Summary -}}
 {{- else }}
 - [{{$change.Key}}] {{$change.Fields.Summary -}}
 {{- end -}}
     {{ end -}}
 {{ end }}
+
+:warning: = Work in Progress. Ensure that these cards don't break things in production.

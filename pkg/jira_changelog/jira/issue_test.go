@@ -19,29 +19,19 @@ func TestIssueId(t *testing.T) {
 			want:          jira.JiraIssueId("TEST-123"),
 		},
 		{
-			desc:          "when jira issue is present but not in correct format",
-			commitMessage: "TEST-123 Test commit message",
-			want:          jira.JiraIssueId("TEST-123"),
-		},
-		{
 			desc:          "when jira issue is not present in commit message",
 			commitMessage: "Test commit message",
 			want:          jira.JiraIssueId(""),
 		},
 		{
-			desc:          "when jira issue is present in between in commit message",
-			commitMessage: "[somethin-odd-1][TEST-1235]Test commit message",
-			want:          jira.JiraIssueId("TEST-1235"),
-		},
-		{
 			desc:          "when jira issue is of different project",
-			commitMessage: "[somethin-odd-1][OTHER-1235]Test commit message",
-			want:          jira.JiraIssueId(""),
+			commitMessage: "[OTHER-1235]Test commit message",
+			want:          jira.JiraIssueId("OTHER-1235"),
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			got := jira.IssueId("TEST", tc.commitMessage)
+			got := jira.IssueId(tc.commitMessage)
 			assert.Equal(t, tc.want, got)
 		})
 	}

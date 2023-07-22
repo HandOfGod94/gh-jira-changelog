@@ -2,6 +2,7 @@ package jira_changelog
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/git"
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira"
@@ -58,15 +59,16 @@ func (c Generator) changelogFromCommits(commits []git.Commit) (*Changelog, error
 }
 
 func (c Generator) fetchJiraIssue(commit git.Commit) (jira.Issue, error) {
-	issueId := jira.IssueId(c.JiraConfig.ProjectName, commit.Message)
+	issueId := jira.IssueId(commit.Message)
 	if issueId == "" {
-		slog.Warn("commit message does not contain issue jira id of the project", "commit", commit, "project", c.JiraConfig.ProjectName)
-		return jira.NewIssue("", commit.Message, "done", ""), nil
+		slog.Warn("commit message does not contain issue jira id of the project", "commit", commit)
+		return jira.NewIssue("", fmt.Sprintf("%s (%s)", commit.Message, commit.Sha), "done", ""), nil
 	}
 
 	issue, err := c.client.FetchIssue(string(issueId))
 	if err != nil {
-		return jira.Issue{}, err
+		slog.Warn("failed to fetch jira issue", "commit", commit)
+		return jira.NewIssue("", fmt.Sprintf("%s (%s)", commit.Message, commit.Sha), "done", ""), nil
 	}
 	return issue, nil
 }

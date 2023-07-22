@@ -23,7 +23,7 @@ type GitOutput string
 var gitoutputPattern = regexp.MustCompile(`^\((\d+)\)\s+\{(\w+)\}\s*(.*)`)
 
 func ExecGitLog(ctx context.Context, fromRef, toRef string) (GitOutput, error) {
-	cmd := exec.CommandContext(ctx, "git", "log", "--decorate-refs-exclude=refs/tags", "--pretty=(%ct) {%h} %d %s", "--no-merges", fromRef+".."+toRef)
+	cmd := exec.CommandContext(ctx, "git", "log", "--decorate-refs-exclude=refs/*", "--pretty=(%ct) {%h} %d %s", "--no-merges", fromRef+".."+toRef)
 	stdout, err := cmd.Output()
 	if err != nil {
 		return "", fmt.Errorf("failed to execute git command: %v", err)
