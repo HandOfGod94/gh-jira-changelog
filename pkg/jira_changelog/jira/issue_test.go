@@ -28,6 +28,11 @@ func TestIssueId(t *testing.T) {
 			commitMessage: "[OTHER-1235]Test commit message",
 			want:          jira.JiraIssueId("OTHER-1235"),
 		},
+		{
+			desc:          "when jira issue id is not in square brackets",
+			commitMessage: "OTHER-4567 Test commit message",
+			want:          jira.JiraIssueId("OTHER-4567"),
+		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

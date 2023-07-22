@@ -5,7 +5,7 @@ import (
 	"regexp"
 )
 
-const jiraIssuePattern = `^\[(?P<projectName>[A-Z]+)-(?P<issueId>\d+)\].*`
+const jiraIssuePattern = `\[?(?P<projectName>[A-Z]+)-(?P<issueId>\d+)\]?.*`
 
 type Issue struct {
 	Id     string `json:"id"`
