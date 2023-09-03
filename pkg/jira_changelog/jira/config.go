@@ -1,7 +1,7 @@
 package jira
 
 type Config struct {
-	BaseUrl  string
+	BaseURL  string
 	User     string
 	ApiToken string
 }

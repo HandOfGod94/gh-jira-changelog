@@ -21,7 +21,6 @@ var (
 	fromRef        string
 	toRef          string
 	writeTo        string
-	repoURL        string
 	DefaultTimeout = 5 * time.Second
 	requiredFlags  = []string{"base_url", "email_id", "api_token", "repo_url"}
 )
@@ -79,17 +78,17 @@ gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 
 		changelog := jira_changelog.NewGenerator(
 			jira.Config{
-				BaseUrl:  viper.GetString("base_url"),
+				BaseURL:  viper.GetString("base_url"),
 				ApiToken: viper.GetString("api_token"),
 				User:     viper.GetString("email_id"),
 			},
 			fromRef,
 			toRef,
-			repoURL,
+			viper.GetString("repo_url"),
 		)
 
 		slog.Info("Generating changelog", "JiraConfig", changelog.JiraConfig,
-			"From", fromRef, "To", toRef, "repoURL", repoURL)
+			"From", fromRef, "To", toRef, "repoURL", viper.GetString("repo_url"))
 		changelog.Generate(ctx).Render(writer(writeTo))
 	},
 }
@@ -115,7 +114,6 @@ func init() {
 	generateCmd.Flags().StringVar(&fromRef, "from", "", "Git ref to start from")
 	generateCmd.Flags().StringVar(&toRef, "to", "main", "Git ref to end at")
 	generateCmd.Flags().StringVar(&writeTo, "write_to", "/dev/stdout", "File stream to write the changelog")
-	generateCmd.Flags().StringVar(&repoURL, "repo_url", "", "Repo URL. Used to generate diff url. Currently only github is supported")
 
 	generateCmd.MarkFlagRequired("from")
 

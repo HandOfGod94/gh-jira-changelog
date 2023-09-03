@@ -108,7 +108,6 @@ gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 Flags:
       --from string       Git ref to start from
   -h, --help              help for generate
-      --repo_url string   Repo URL. Used to generate diff url. Currently only github is supported
       --to string         Git ref to end at (default "main")
       --write_to string   File stream to write the changelog (default "/dev/stdout")
 
@@ -118,4 +117,5 @@ Global Flags:
       --config string      config file (default is ./.jira_changelog.yaml)
       --email_id string    email id of the user
   -v, --log_level string   log level. options: debug, info, warn, error (default "error")
+      --repo_url string    Repo URL. Used to generate diff url. Currently only github is supported
 ```

@@ -31,7 +31,7 @@ func (c *client) attachDefaultHeaders(r *http.Request) {
 }
 
 func (c *client) FetchIssue(issueId string) (Issue, error) {
-	requestUrl, err := url.JoinPath(c.config.BaseUrl, "rest", "api", "3", "issue", issueId)
+	requestUrl, err := url.JoinPath(c.config.BaseURL, "rest", "api", "3", "issue", issueId)
 	slog.Debug("Preparing fetch request", "url", requestUrl)
 	if err != nil {
 		return Issue{}, fmt.Errorf("failed to create request url. %w", err)
