@@ -14,6 +14,7 @@ type Generator struct {
 	JiraConfig jira.Config
 	fromRef    string
 	toRef      string
+	repoURL    string
 	client     jira.Client
 }
 
@@ -30,13 +31,15 @@ func (c Generator) Generate(ctx context.Context) *Changelog {
 	commits, err := gitOutput.Commits()
 	panicIfErr(err)
 
-	changelog, err := c.changelogFromCommits(commits)
+	changes, err := c.changesFromCommits(commits)
 	panicIfErr(err)
 
-	return changelog
+	slog.Debug("changes fetched", "changes", changes)
+
+	return NewChangelog(c.fromRef, c.toRef, c.repoURL, changes)
 }
 
-func (c Generator) changelogFromCommits(commits []git.Commit) (*Changelog, error) {
+func (c Generator) changesFromCommits(commits []git.Commit) (Changes, error) {
 	slog.Debug("Total commit messages", "count", len(commits))
 
 	jiraIssues := make([]jira.Issue, 0)
@@ -55,7 +58,7 @@ func (c Generator) changelogFromCommits(commits []git.Commit) (*Changelog, error
 	slog.Debug("Total jira issues ids", "count", len(jiraIssues))
 
 	issuesByEpic := lo.GroupBy(jiraIssues, func(issue jira.Issue) string { return issue.Epic() })
-	return &Changelog{Changes: issuesByEpic}, nil
+	return issuesByEpic, nil
 }
 
 func (c Generator) fetchJiraIssue(commit git.Commit) (jira.Issue, error) {
@@ -73,12 +76,13 @@ func (c Generator) fetchJiraIssue(commit git.Commit) (jira.Issue, error) {
 	return issue, nil
 }
 
-func NewGenerator(jiraConfig jira.Config, fromRef, toRef string) *Generator {
+func NewGenerator(jiraConfig jira.Config, fromRef, toRef, repoURL string) *Generator {
 	client := jira.NewClient(jiraConfig)
 	return &Generator{
 		jiraConfig,
 		fromRef,
 		toRef,
+		repoURL,
 		client,
 	}
 }

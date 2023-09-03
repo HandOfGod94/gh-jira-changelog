@@ -25,7 +25,7 @@ func TestRender(t *testing.T) {
 					},
 				},
 			},
-			want: `## What has changed?
+			want: `## What's changed?
 
 ### TestEpic
 - [TEST-1] foobar is new
@@ -45,7 +45,7 @@ func TestRender(t *testing.T) {
 					},
 				},
 			},
-			want: `## What has changed?
+			want: `## What's changed?
 
 ### TestEpic
 - [TEST-1] foobar is new
@@ -71,7 +71,7 @@ func TestRender(t *testing.T) {
 					},
 				},
 			},
-			want: `## What has changed?
+			want: `## What's changed?
 
 ### TestEpic1
 - [TEST-1] foobar is new

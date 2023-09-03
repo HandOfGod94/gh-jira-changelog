@@ -22,7 +22,7 @@ func TestChangelogFromCommits(t *testing.T) {
 	}
 
 	expected := &Changelog{
-		Changes: map[string][]jira.Issue{
+		Changes: Changes{
 			"Epic1": {
 				jira.NewIssue("TEST-1234", "Ticket description", "done", "Epic1"),
 				jira.NewIssue("TEST-12345", "Ticket description of another from same epic", "done", "Epic1"),
@@ -44,7 +44,7 @@ func TestChangelogFromCommits(t *testing.T) {
 	generator := Generator{}
 	generator.client = mockedClient
 
-	result, err := generator.changelogFromCommits(commits)
+	result, err := generator.changesFromCommits(commits)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expected, result)

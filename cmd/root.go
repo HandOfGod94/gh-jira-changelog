@@ -56,6 +56,7 @@ func init() {
 	rootCmd.PersistentFlags().String("email_id", "", "email id of the user")
 	rootCmd.PersistentFlags().StringP("api_token", "t", "", "API token for jira")
 	rootCmd.PersistentFlags().StringP("log_level", "v", "error", "log level. options: debug, info, warn, error")
+	rootCmd.PersistentFlags().StringVar(&repoURL, "repo_url", "", "Repo URL. Used to generate diff url. Currently only github is supported")
 
 	viper.BindPFlags(rootCmd.PersistentFlags())
 }

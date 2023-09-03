@@ -33,6 +33,18 @@ func ExecGitLog(ctx context.Context, fromRef, toRef string) (GitOutput, error) {
 	return GitOutput(result), nil
 }
 
+func FetchGitRemoteURL(ctx context.Context) (string, error) {
+	cmd := exec.CommandContext(ctx, "git", "remote", "get-url", "origin")
+	stdout, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("failed to execute git command: %v", err)
+	}
+
+	result := strings.TrimSpace(string(stdout))
+	result = strings.TrimSuffix(result, ".git")
+	return result, nil
+}
+
 func (gt GitOutput) Commits() ([]Commit, error) {
 	output := strings.TrimSpace(string(gt))
 	commits := make([]Commit, 0)
