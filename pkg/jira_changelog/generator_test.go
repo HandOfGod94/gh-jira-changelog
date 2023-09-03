@@ -21,19 +21,17 @@ func TestChangelogFromCommits(t *testing.T) {
 		{Time: time.Now(), Message: "foobar commit message random", Sha: "3245vw"},
 	}
 
-	expected := &Changelog{
-		Changes: Changes{
-			"Epic1": {
-				jira.NewIssue("TEST-1234", "Ticket description", "done", "Epic1"),
-				jira.NewIssue("TEST-12345", "Ticket description of another from same epic", "done", "Epic1"),
-			},
-			"Epic2": {
-				jira.NewIssue("TEST-4546", "Ticket description for 4546 issue", "done", "Epic2"),
-			},
-			"Miscellaneous": {
-				jira.NewIssue("", "[NO-CARD] commit message random (3245vw)", "done", ""),
-				jira.NewIssue("", "foobar commit message random (3245vw)", "done", ""),
-			},
+	expected := Changes{
+		"Epic1": {
+			jira.NewIssue("TEST-1234", "Ticket description", "done", "Epic1"),
+			jira.NewIssue("TEST-12345", "Ticket description of another from same epic", "done", "Epic1"),
+		},
+		"Epic2": {
+			jira.NewIssue("TEST-4546", "Ticket description for 4546 issue", "done", "Epic2"),
+		},
+		"Miscellaneous": {
+			jira.NewIssue("", "[NO-CARD] commit message random (3245vw)", "done", ""),
+			jira.NewIssue("", "foobar commit message random (3245vw)", "done", ""),
 		},
 	}
 
