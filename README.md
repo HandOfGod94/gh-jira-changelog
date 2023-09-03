@@ -28,7 +28,7 @@ brew install handofgod94/tap/gh-jira-changelog
 
 #### Go Toolchain
 ```sh
-go install github.com/handofgod94/gh-jira-changelog@v0.2.0
+go install github.com/handofgod94/gh-jira-changelog@v0.3.0
 ```
 The go binary will be installed in `$GOPATH/bin`
 
@@ -98,12 +98,12 @@ gh-jira-changelog generate --config="<path-to-config-file>.yaml" --from=<git-ref
 BASE_URL=<you-atlassian-url> API_TOKEN=<jira-api-token> gh-jira-changelog generate --from=<git-ref> --to=<git-ref>
 
 # generating changelog between 2 git tags
-gh-jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0" --to="v0.2.0"
+gh-jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0" --to="v0.3.0"
 
 
 # Using it as GH plugin
 # assuming jira plugin installed
-gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0" --to="v0.2.0"
+gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0" --to="v0.3.0"
 
 Flags:
       --from string       Git ref to start from
