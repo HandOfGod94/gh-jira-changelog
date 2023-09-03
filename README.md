@@ -65,6 +65,7 @@ Flags:
       --email_id string    email id of the user
   -h, --help               help for gh-jira-changelog
   -v, --log_level string   log level. options: debug, info, warn, error (default "error")
+      --repo_url string    Repo URL. Used to generate diff url. Currently only github is supported
 
 Use "gh-jira-changelog [command] --help" for more information about a command.
 ```
@@ -86,6 +87,7 @@ gh-jira-changelog generate \
 	--to="<git-ref>" \
 	--api_token="<jira-api-token>" \
 	--email_id="jira-email-id"
+	--repo_url="https://github.com/<org>/<repo>"
 
 # using config file
 # all the jira config such as (base_url, api_token, email_id) can be stored in a config file
@@ -106,6 +108,7 @@ gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 Flags:
       --from string       Git ref to start from
   -h, --help              help for generate
+      --repo_url string   Repo URL. Used to generate diff url. Currently only github is supported
       --to string         Git ref to end at (default "main")
       --write_to string   File stream to write the changelog (default "/dev/stdout")
 
