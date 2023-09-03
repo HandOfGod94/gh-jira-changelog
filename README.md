@@ -36,7 +36,7 @@ The go binary will be installed in `$GOPATH/bin`
 
 `$ gh-jira-changelog version`
 ```
-v0.2.0
+v0.3.0
 ```
 
 ### Usage
