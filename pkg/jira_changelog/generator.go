@@ -40,7 +40,7 @@ const (
 
 func NewGenerator(jiraConfig jira.Config, fromRef, toRef, repoURL string) *Generator {
 	client := jira.NewClient(jiraConfig)
-	generator := &Generator{
+	g := &Generator{
 		JiraConfig: jiraConfig,
 		fromRef:    fromRef,
 		toRef:      toRef,
@@ -48,7 +48,7 @@ func NewGenerator(jiraConfig jira.Config, fromRef, toRef, repoURL string) *Gener
 		client:     client,
 	}
 
-	generator.FSM = fsm.NewFSM(
+	g.FSM = fsm.NewFSM(
 		Initial,
 		fsm.Events{
 			{Name: FetchCommits, Src: []string{Initial}, Dst: CommitsFetched},
@@ -64,27 +64,27 @@ func NewGenerator(jiraConfig jira.Config, fromRef, toRef, repoURL string) *Gener
 					e.Cancel(err)
 					return
 				}
-				generator.commits = commits
+				g.commits = commits
 			},
 			Before(FetchJiraIssues): func(ctx context.Context, e *fsm.Event) {
-				issues, err := generator.fetchJiraIssues(generator.commits)
+				issues, err := g.fetchJiraIssues(g.commits)
 				if err != nil {
 					e.Cancel(err)
 					return
 				}
-				generator.jiraIssues = issues
+				g.jiraIssues = issues
 			},
 			Before(GroupJiraIssues): func(ctx context.Context, e *fsm.Event) {
-				jiraIssues := lo.Uniq(generator.jiraIssues)
+				jiraIssues := lo.Uniq(g.jiraIssues)
 				slog.Debug("Total jira issues ids", "count", len(jiraIssues))
 
 				issuesByEpic := lo.GroupBy(jiraIssues, func(issue jira.Issue) string { return issue.Epic() })
-				generator.changes = issuesByEpic
+				g.changes = issuesByEpic
 			},
 		},
 	)
 
-	return generator
+	return g
 }
 
 func panicIfErr(err error) {
