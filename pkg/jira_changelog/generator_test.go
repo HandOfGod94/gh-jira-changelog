@@ -42,7 +42,7 @@ func TestChangelogFromCommits(t *testing.T) {
 	generator := Generator{}
 	generator.client = mockedClient
 
-	result, err := generator.changesFromCommits(commits)
+	result, err := generator.fetchJiraIssues(commits)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expected, result)

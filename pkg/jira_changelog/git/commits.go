@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"time"
 
+	. "github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/fsm_util"
 	"github.com/looplab/fsm"
 )
 
@@ -19,15 +20,17 @@ type Commit struct {
 var gitoutputPattern = regexp.MustCompile(`^\((\d+)\)\s+\{(\w+)\}\s*(.*)`)
 
 const (
-	InitialState    = "initial"
-	CommandExecuted = "command_executed"
-	OutuptParsed    = "output_parsed"
+	InitialState    = State("initial_state")
+	CommandExecuted = State("command_executed")
+	OutuptParsed    = State("output_parsed")
+	ExecuteGitLog   = Event("execute_git_log")
+	ParseOutput     = Event("parse_output")
 )
 
 type commitParseWorkflow struct {
 	fromRef   string
 	toRef     string
-	gitOutput GitOutput
+	GitOutput GitOutput
 	commits   []Commit
 	FSM       *fsm.FSM
 }
@@ -41,20 +44,20 @@ func NewCommitParseWorkflow(fromRef, toRef string) *commitParseWorkflow {
 	cpw.FSM = fsm.NewFSM(
 		InitialState,
 		fsm.Events{
-			{Name: "execute_git_log", Src: []string{InitialState}, Dst: CommandExecuted},
-			{Name: "parse_output", Src: []string{CommandExecuted}, Dst: OutuptParsed},
+			{Name: ExecuteGitLog, Src: []string{InitialState}, Dst: CommandExecuted},
+			{Name: ParseOutput, Src: []string{CommandExecuted}, Dst: OutuptParsed},
 		},
 		fsm.Callbacks{
-			"before_execute_git_log": func(ctx context.Context, e *fsm.Event) {
+			Before(ExecuteGitLog): func(ctx context.Context, e *fsm.Event) {
 				ouptut, err := execGitLog(ctx, fromRef, toRef)
 				if err != nil {
 					e.Cancel(err)
 					return
 				}
-				cpw.gitOutput = ouptut
+				cpw.GitOutput = ouptut
 			},
-			"before_parse_output": func(ctx context.Context, e *fsm.Event) {
-				commits, err := cpw.gitOutput.Commits()
+			Before(ParseOutput): func(ctx context.Context, e *fsm.Event) {
+				commits, err := cpw.GitOutput.Commits()
 				if err != nil {
 					e.Cancel(err)
 					return
