@@ -25,11 +25,11 @@ func panicIfErr(err error) {
 }
 
 func (c Generator) Generate(ctx context.Context) *Changelog {
-	gitOutput, err := git.ExecGitLog(ctx, c.fromRef, c.toRef)
-	panicIfErr(err)
-
-	commits, err := gitOutput.Commits()
-	panicIfErr(err)
+	gcw := git.NewCommitParseWorkflow(c.fromRef, c.toRef)
+	commits, err := gcw.Commits(ctx)
+	if err != nil {
+		panic(fmt.Errorf("failed at \"%s\" state. %w. State: %+v", gcw.FSM.Current(), err, gcw))
+	}
 
 	changes, err := c.changesFromCommits(commits)
 	panicIfErr(err)

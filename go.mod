@@ -3,6 +3,7 @@ module github.com/handofgod94/gh-jira-changelog
 go 1.20
 
 require (
+	github.com/looplab/fsm v1.0.1
 	github.com/samber/lo v1.38.1
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.16.0
