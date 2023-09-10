@@ -29,11 +29,11 @@ const (
 	Initial           = State("initial")
 	CommitsFetched    = State("commits_fetched")
 	JiraIssuesFetched = State("jira_issues_fetched")
-	ChangelogRecored  = State("changelog_recorded")
+	ChangesRecorded   = State("changes_recorded")
 
 	FetchCommits    = Event("fetch_commits")
 	FetchJiraIssues = Event("fetch_jira_issues")
-	RecordChangelog = Event("record_changelog")
+	RecordChanges   = Event("record_changes")
 )
 
 func NewGenerator(jiraConfig jira.Config, fromRef, toRef, repoURL string) *Generator {
@@ -51,7 +51,7 @@ func NewGenerator(jiraConfig jira.Config, fromRef, toRef, repoURL string) *Gener
 		fsm.Events{
 			{Name: FetchCommits, Src: []string{Initial}, Dst: CommitsFetched},
 			{Name: FetchJiraIssues, Src: []string{CommitsFetched}, Dst: JiraIssuesFetched},
-			{Name: RecordChangelog, Src: []string{JiraIssuesFetched}, Dst: ChangelogRecored},
+			{Name: RecordChanges, Src: []string{JiraIssuesFetched}, Dst: ChangesRecorded},
 		},
 		fsm.Callbacks{
 			Before(FetchCommits): func(ctx context.Context, e *fsm.Event) {
@@ -71,7 +71,7 @@ func NewGenerator(jiraConfig jira.Config, fromRef, toRef, repoURL string) *Gener
 				}
 				g.jiraIssues = lo.Uniq(issues)
 			},
-			RecordChangelog: func(ctx context.Context, e *fsm.Event) {
+			RecordChanges: func(ctx context.Context, e *fsm.Event) {
 				slog.Debug("Total jira issues ids", "count", len(g.jiraIssues))
 				slog.Debug("Recroding changelog")
 
@@ -82,7 +82,6 @@ func NewGenerator(jiraConfig jira.Config, fromRef, toRef, repoURL string) *Gener
 			},
 		},
 	)
-
 	return g
 }
 
@@ -95,7 +94,7 @@ func panicIfErr(err error) {
 func (c *Generator) Generate(ctx context.Context) *Changelog {
 	panicIfErr(c.FSM.Event(ctx, FetchCommits))
 	panicIfErr(c.FSM.Event(ctx, FetchJiraIssues))
-	panicIfErr(c.FSM.Event(ctx, RecordChangelog))
+	panicIfErr(c.FSM.Event(ctx, RecordChanges))
 
 	slog.Debug("Total changelog items", "count", len(c.changes))
 
