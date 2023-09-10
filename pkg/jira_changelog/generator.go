@@ -69,13 +69,15 @@ func NewGenerator(jiraConfig jira.Config, fromRef, toRef, repoURL string) *Gener
 					e.Cancel(err)
 					return
 				}
-				g.jiraIssues = issues
+				g.jiraIssues = lo.Uniq(issues)
 			},
-			Before(RecordChangelog): func(ctx context.Context, e *fsm.Event) {
-				jiraIssues := lo.Uniq(g.jiraIssues)
-				slog.Debug("Total jira issues ids", "count", len(jiraIssues))
+			RecordChangelog: func(ctx context.Context, e *fsm.Event) {
+				slog.Debug("Total jira issues ids", "count", len(g.jiraIssues))
+				slog.Debug("Recroding changelog")
 
-				issuesByEpic := lo.GroupBy(jiraIssues, func(issue jira.Issue) string { return issue.Epic() })
+				issuesByEpic := lo.GroupBy(g.jiraIssues, func(issue jira.Issue) string { return issue.Epic() })
+
+				slog.Debug("Total epics", "count", len(issuesByEpic))
 				g.changes = issuesByEpic
 			},
 		},
@@ -90,15 +92,17 @@ func panicIfErr(err error) {
 	}
 }
 
-func (c Generator) Generate(ctx context.Context) *Changelog {
+func (c *Generator) Generate(ctx context.Context) *Changelog {
 	panicIfErr(c.FSM.Event(ctx, FetchCommits))
 	panicIfErr(c.FSM.Event(ctx, FetchJiraIssues))
 	panicIfErr(c.FSM.Event(ctx, RecordChangelog))
 
+	slog.Debug("Total changelog items", "count", len(c.changes))
+
 	return NewChangelog(c.fromRef, c.toRef, c.repoURL, c.changes)
 }
 
-func (c Generator) fetchJiraIssues(commits []git.Commit) ([]jira.Issue, error) {
+func (c *Generator) fetchJiraIssues(commits []git.Commit) ([]jira.Issue, error) {
 	slog.Debug("Total commit messages", "count", len(commits))
 
 	jiraIssues := make([]jira.Issue, 0)
@@ -115,7 +119,7 @@ func (c Generator) fetchJiraIssues(commits []git.Commit) ([]jira.Issue, error) {
 	return jiraIssues, nil
 }
 
-func (c Generator) fetchJiraIssue(commit git.Commit) (jira.Issue, error) {
+func (c *Generator) fetchJiraIssue(commit git.Commit) (jira.Issue, error) {
 	issueId := jira.IssueId(commit.Message)
 	if issueId == "" {
 		slog.Warn("commit message does not contain issue jira id of the project", "commit", commit)
