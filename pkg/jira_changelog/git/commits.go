@@ -23,8 +23,9 @@ const (
 	InitialState    = State("initial_state")
 	CommandExecuted = State("command_executed")
 	OutuptParsed    = State("output_parsed")
-	ExecuteGitLog   = Event("execute_git_log")
-	ParseOutput     = Event("parse_output")
+
+	ExecuteGitLog = Event("execute_git_log")
+	ParseOutput   = Event("parse_output")
 )
 
 type commitParseWorkflow struct {
@@ -70,12 +71,12 @@ func NewCommitParseWorkflow(fromRef, toRef string) *commitParseWorkflow {
 }
 
 func (cpw *commitParseWorkflow) Commits(ctx context.Context) ([]Commit, error) {
-	err := cpw.FSM.Event(ctx, "execute_git_log")
+	err := cpw.FSM.Event(ctx, ExecuteGitLog)
 	if err != nil {
 		return []Commit{}, fmt.Errorf("failed to execute git log. %w", err)
 	}
 
-	err = cpw.FSM.Event(ctx, "parse_output")
+	err = cpw.FSM.Event(ctx, ParseOutput)
 	if err != nil {
 		return []Commit{}, fmt.Errorf("failed to parse output. %w", err)
 	}
