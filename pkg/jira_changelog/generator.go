@@ -31,12 +31,6 @@ func NewGenerator(jiraConfig jira.Config, fromRef, toRef, repoURL string) *Gener
 	return g
 }
 
-func panicIfErr(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
 func (c *Generator) Generate(ctx context.Context) *Changelog {
 	commits, err := git.NewCommitPopulator(c.fromRef, c.toRef).Commits(ctx)
 	panicIfErr(err)
@@ -82,3 +76,10 @@ func (c *Generator) fetchJiraIssue(commit git.Commit) (jira.Issue, error) {
 	}
 	return issue, nil
 }
+
+func panicIfErr(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
