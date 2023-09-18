@@ -6,9 +6,6 @@ import (
 	"os/exec"
 	"regexp"
 	"time"
-
-	. "github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/fsm_util"
-	"github.com/looplab/fsm"
 )
 
 type Commit struct {
@@ -19,69 +16,31 @@ type Commit struct {
 
 var gitoutputPattern = regexp.MustCompile(`^\((\d+)\)\s+\{(\w+)\}\s*(.*)`)
 
-const (
-	InitialState    = State("initial_state")
-	CommandExecuted = State("command_executed")
-	OutuptParsed    = State("output_parsed")
-
-	ExecuteGitLog = Event("execute_git_log")
-	ParseOutput   = Event("parse_output")
-)
-
-type commitParseWorkflow struct {
-	fromRef   string
-	toRef     string
-	GitOutput GitOutput
-	commits   []Commit
-	FSM       *fsm.FSM
+type commitPopulator struct {
+	fromRef string
+	toRef   string
 }
 
-func NewCommitParseWorkflow(fromRef, toRef string) *commitParseWorkflow {
-	cpw := &commitParseWorkflow{
+func NewCommitPopulator(fromRef, toRef string) *commitPopulator {
+	cpw := &commitPopulator{
 		fromRef: fromRef,
 		toRef:   toRef,
 	}
-
-	cpw.FSM = fsm.NewFSM(
-		InitialState,
-		fsm.Events{
-			{Name: ExecuteGitLog, Src: []string{InitialState}, Dst: CommandExecuted},
-			{Name: ParseOutput, Src: []string{CommandExecuted}, Dst: OutuptParsed},
-		},
-		fsm.Callbacks{
-			Before(ExecuteGitLog): func(ctx context.Context, e *fsm.Event) {
-				ouptut, err := execGitLog(ctx, fromRef, toRef)
-				if err != nil {
-					e.Cancel(err)
-					return
-				}
-				cpw.GitOutput = ouptut
-			},
-			Before(ParseOutput): func(ctx context.Context, e *fsm.Event) {
-				commits, err := cpw.GitOutput.Commits()
-				if err != nil {
-					e.Cancel(err)
-					return
-				}
-				cpw.commits = commits
-			},
-		},
-	)
 	return cpw
 }
 
-func (cpw *commitParseWorkflow) Commits(ctx context.Context) ([]Commit, error) {
-	err := cpw.FSM.Event(ctx, ExecuteGitLog)
+func (cpw *commitPopulator) Commits(ctx context.Context) ([]Commit, error) {
+	gitOutput, err := execGitLog(ctx, cpw.fromRef, cpw.toRef)
 	if err != nil {
 		return []Commit{}, fmt.Errorf("failed to execute git log. %w", err)
 	}
 
-	err = cpw.FSM.Event(ctx, ParseOutput)
+	commits, err := gitOutput.Commits()
 	if err != nil {
 		return []Commit{}, fmt.Errorf("failed to parse output. %w", err)
 	}
 
-	return cpw.commits, nil
+	return commits, nil
 }
 
 func execGitLog(ctx context.Context, fromRef, toRef string) (GitOutput, error) {

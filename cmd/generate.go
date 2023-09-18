@@ -21,7 +21,7 @@ var (
 	fromRef        string
 	toRef          string
 	writeTo        string
-	DefaultTimeout = 60 * time.Second
+	DefaultTimeout = 10 * time.Second
 	requiredFlags  = []string{"base_url", "email_id", "api_token", "repo_url"}
 )
 

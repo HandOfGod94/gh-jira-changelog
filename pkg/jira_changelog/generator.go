@@ -4,10 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	. "github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/fsm_util"
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/git"
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira"
-	"github.com/looplab/fsm"
 	"github.com/samber/lo"
 	"golang.org/x/exp/slog"
 )
@@ -18,23 +16,7 @@ type Generator struct {
 	toRef      string
 	repoURL    string
 	client     jira.Client
-
-	commits    []git.Commit
-	jiraIssues []jira.Issue
-	changes    Changes
-	FSM        *fsm.FSM
 }
-
-const (
-	Initial           = State("initial")
-	CommitsFetched    = State("commits_fetched")
-	JiraIssuesFetched = State("jira_issues_fetched")
-	ChangesRecorded   = State("changes_recorded")
-
-	FetchCommits    = Event("fetch_commits")
-	FetchJiraIssues = Event("fetch_jira_issues")
-	RecordChanges   = Event("record_changes")
-)
 
 func NewGenerator(jiraConfig jira.Config, fromRef, toRef, repoURL string) *Generator {
 	client := jira.NewClient(jiraConfig)
@@ -46,42 +28,6 @@ func NewGenerator(jiraConfig jira.Config, fromRef, toRef, repoURL string) *Gener
 		client:     client,
 	}
 
-	g.FSM = fsm.NewFSM(
-		Initial,
-		fsm.Events{
-			{Name: FetchCommits, Src: []string{Initial}, Dst: CommitsFetched},
-			{Name: FetchJiraIssues, Src: []string{CommitsFetched}, Dst: JiraIssuesFetched},
-			{Name: RecordChanges, Src: []string{JiraIssuesFetched}, Dst: ChangesRecorded},
-		},
-		fsm.Callbacks{
-			Before(FetchCommits): func(ctx context.Context, e *fsm.Event) {
-				gcw := git.NewCommitParseWorkflow(fromRef, toRef)
-				commits, err := gcw.Commits(ctx)
-				if err != nil {
-					e.Cancel(err)
-					return
-				}
-				g.commits = commits
-			},
-			Before(FetchJiraIssues): func(ctx context.Context, e *fsm.Event) {
-				issues, err := g.fetchJiraIssues(g.commits)
-				if err != nil {
-					e.Cancel(err)
-					return
-				}
-				g.jiraIssues = lo.Uniq(issues)
-			},
-			RecordChanges: func(ctx context.Context, e *fsm.Event) {
-				slog.Debug("Total jira issues ids", "count", len(g.jiraIssues))
-				slog.Debug("Recroding changelog")
-
-				issuesByEpic := lo.GroupBy(g.jiraIssues, func(issue jira.Issue) string { return issue.Epic() })
-
-				slog.Debug("Total epics", "count", len(issuesByEpic))
-				g.changes = issuesByEpic
-			},
-		},
-	)
 	return g
 }
 
@@ -92,13 +38,17 @@ func panicIfErr(err error) {
 }
 
 func (c *Generator) Generate(ctx context.Context) *Changelog {
-	panicIfErr(c.FSM.Event(ctx, FetchCommits))
-	panicIfErr(c.FSM.Event(ctx, FetchJiraIssues))
-	panicIfErr(c.FSM.Event(ctx, RecordChanges))
+	commits, err := git.NewCommitPopulator(c.fromRef, c.toRef).Commits(ctx)
+	panicIfErr(err)
 
-	slog.Debug("Total changelog items", "count", len(c.changes))
+	issues, err := c.fetchJiraIssues(commits)
+	panicIfErr(err)
 
-	return NewChangelog(c.fromRef, c.toRef, c.repoURL, c.changes)
+	issuesByEpic := lo.GroupBy(issues, func(issue jira.Issue) string { return issue.Epic() })
+
+	slog.Debug("Total epics", "count", len(issuesByEpic))
+
+	return NewChangelog(c.fromRef, c.toRef, c.repoURL, issuesByEpic)
 }
 
 func (c *Generator) fetchJiraIssues(commits []git.Commit) ([]jira.Issue, error) {
@@ -115,7 +65,7 @@ func (c *Generator) fetchJiraIssues(commits []git.Commit) ([]jira.Issue, error) 
 		slog.Debug("fetched issue", "issue", issue)
 		jiraIssues = append(jiraIssues, issue)
 	}
-	return jiraIssues, nil
+	return lo.Uniq(jiraIssues), nil
 }
 
 func (c *Generator) fetchJiraIssue(commit git.Commit) (jira.Issue, error) {
