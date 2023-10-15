@@ -79,7 +79,7 @@ func (a *Authenticator) callbackHandler(w http.ResponseWriter, r *http.Request) 
 	a.oauthToken = tok
 
 	resp, err := a.Client().Get("https://api.atlassian.com/oauth/token/accessible-resources")
-	if err != nil || resp.StatusCode != 200 {
+	if err != nil || resp.StatusCode != http.StatusOK {
 		slog.Error("Failed to fetch accessible-resource from jira", "error", err)
 		slog.Error("Response information", "response_status", resp.Status)
 		panic(err)
