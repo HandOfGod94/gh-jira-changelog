@@ -74,18 +74,11 @@ func (a *Authenticator) Login(ctx context.Context) error {
 	return nil
 }
 
-func (a *Authenticator) isVerifierPresent(ctx context.Context, args ...any) bool {
-	return a.verifier != ""
+func (a *Authenticator) Client() *http.Client {
+	return a.conf.Client(a.ctx, a.oauthToken)
 }
 
-func (a *Authenticator) isTokenValid(ctx context.Context, args ...any) bool {
-	return a.oauthToken != nil && a.oauthToken.Valid()
-}
-
-func (a *Authenticator) isOauthContextPresent(ctx context.Context, args ...any) bool {
-	return a.ctx != nil
-}
-
+// ActionFuncs
 func (a *Authenticator) setupOauthConfig(ctx context.Context, args ...any) error {
 	a.conf = &oauth2.Config{
 		ClientID:     "OOGf9PTJL0hGGC5hWD17G6OkiGKjO0FG",
@@ -124,7 +117,7 @@ func (a *Authenticator) exchangeCode(ctx context.Context, args ...any) error {
 		},
 	})
 
-	// sping up server for callback from RedirectURL and shut it down once we get response
+	// spin up server for callback from RedirectURL and shut it down once we get response
 	a.callback = make(chan *oauth2.Token)
 	mux := http.NewServeMux()
 	mux.HandleFunc("/gh-jira-changelog/oauth/callback", http.HandlerFunc(a.callbackHandler))
@@ -154,10 +147,20 @@ func (a *Authenticator) fetchAccessibleResources(ctx context.Context, args ...an
 	return nil
 }
 
-func (a *Authenticator) Client() *http.Client {
-	return a.conf.Client(a.ctx, a.oauthToken)
+// GaurdFuncs
+func (a *Authenticator) isVerifierPresent(ctx context.Context, args ...any) bool {
+	return a.verifier != ""
 }
 
+func (a *Authenticator) isTokenValid(ctx context.Context, args ...any) bool {
+	return a.oauthToken != nil && a.oauthToken.Valid()
+}
+
+func (a *Authenticator) isOauthContextPresent(ctx context.Context, args ...any) bool {
+	return a.ctx != nil
+}
+
+// oauth RedirectURL callback handler
 func (a *Authenticator) callbackHandler(w http.ResponseWriter, r *http.Request) {
 	code := r.URL.Query().Get("code")
 	token, err := a.conf.Exchange(a.ctx, code, oauth2.VerifierOption(a.verifier))
