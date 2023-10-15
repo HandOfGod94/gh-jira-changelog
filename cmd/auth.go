@@ -21,7 +21,9 @@ as Atlassian currently doesn't support PKCE verification for oauth flow.`,
 		switch args[0] {
 		case "login":
 			a := jira.NewAuthenticator()
-			a.Login(context.Background())
+			if err := a.Login(context.Background()); err != nil {
+				return err
+			}
 		case "logout":
 			panic("To be implemented")
 		default:

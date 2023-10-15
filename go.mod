@@ -3,6 +3,7 @@ module github.com/handofgod94/gh-jira-changelog
 go 1.20
 
 require (
+	github.com/qmuntal/stateless v1.6.7
 	github.com/samber/lo v1.38.1
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/spf13/cobra v1.7.0
