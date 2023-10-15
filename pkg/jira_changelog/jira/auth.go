@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -83,6 +84,14 @@ func (a *Authenticator) callbackHandler(w http.ResponseWriter, r *http.Request) 
 		slog.Error("Response information", "response_status", resp.Status)
 		panic(err)
 	}
+
+	accessibleResources, err := io.ReadAll(resp.Body)
+	if err != nil {
+		slog.Error("failed to read accessibleResources", "error", err)
+		panic(err)
+	}
+	slog.Debug("Retrieved accessible resources successfully", "resources", string(accessibleResources))
+
 
 	msg := "<h1>Authentication successful!</h1>"
 	msg = msg + "<p>You are authenticated and can now return to the CLI.</p>"
