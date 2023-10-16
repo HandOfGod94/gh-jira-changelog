@@ -1,4 +1,4 @@
-package jira
+package auth
 
 import (
 	"context"
@@ -28,7 +28,7 @@ const (
 	triggerFetchAccessibleResources = "FetchAccessibleResources"
 )
 
-type Authenticator struct {
+type oauthAuthenticator struct {
 	loginWorkflow *stateless.StateMachine
 
 	oauthToken *oauth2.Token
@@ -38,8 +38,8 @@ type Authenticator struct {
 	callback   chan *oauth2.Token
 }
 
-func NewAuthenticator() *Authenticator {
-	a := &Authenticator{}
+func NewAuthenticator() *oauthAuthenticator {
+	a := &oauthAuthenticator{}
 
 	loginWorkflow := stateless.NewStateMachine(stateInit)
 	loginWorkflow.Configure(stateInit).
@@ -61,7 +61,7 @@ func NewAuthenticator() *Authenticator {
 	return a
 }
 
-func (a *Authenticator) Login(ctx context.Context) error {
+func (a *oauthAuthenticator) Login(ctx context.Context) error {
 	a.loginWorkflow.Fire(triggerSetupOauthConfig)
 
 	if err := a.loginWorkflow.FireCtx(ctx, triggerCodeExchange); err != nil {
@@ -74,12 +74,12 @@ func (a *Authenticator) Login(ctx context.Context) error {
 	return nil
 }
 
-func (a *Authenticator) Client() *http.Client {
+func (a *oauthAuthenticator) Client() *http.Client {
 	return a.conf.Client(a.ctx, a.oauthToken)
 }
 
 // ActionFuncs
-func (a *Authenticator) setupOauthConfig(ctx context.Context, args ...any) error {
+func (a *oauthAuthenticator) setupOauthConfig(ctx context.Context, args ...any) error {
 	a.conf = &oauth2.Config{
 		ClientID:     "OOGf9PTJL0hGGC5hWD17G6OkiGKjO0FG",
 		ClientSecret: "ATOAhihA9MN3TOWAJEC4DxxPZMxGyjmA_mH8rUtSGXRIoUP6WQ3UvjCk5Mtx9TUBH6JF089B37D6",
@@ -97,7 +97,7 @@ func (a *Authenticator) setupOauthConfig(ctx context.Context, args ...any) error
 	return nil
 }
 
-func (a *Authenticator) exchangeCode(ctx context.Context, args ...any) error {
+func (a *oauthAuthenticator) exchangeCode(ctx context.Context, args ...any) error {
 	url := a.conf.AuthCodeURL("state", oauth2.S256ChallengeOption(a.verifier),
 		oauth2.SetAuthURLParam("response_type", "code"),
 		oauth2.SetAuthURLParam("prompt", "consent"),
@@ -129,7 +129,7 @@ func (a *Authenticator) exchangeCode(ctx context.Context, args ...any) error {
 	return nil
 }
 
-func (a *Authenticator) fetchAccessibleResources(ctx context.Context, args ...any) error {
+func (a *oauthAuthenticator) fetchAccessibleResources(ctx context.Context, args ...any) error {
 	resp, err := a.Client().Get("https://api.atlassian.com/oauth/token/accessible-resources")
 	if err != nil || resp.StatusCode != http.StatusOK {
 		slog.Error("Failed to fetch accessible-resource from jira", "error", err)
@@ -148,20 +148,20 @@ func (a *Authenticator) fetchAccessibleResources(ctx context.Context, args ...an
 }
 
 // GaurdFuncs
-func (a *Authenticator) isVerifierPresent(ctx context.Context, args ...any) bool {
+func (a *oauthAuthenticator) isVerifierPresent(ctx context.Context, args ...any) bool {
 	return a.verifier != ""
 }
 
-func (a *Authenticator) isTokenValid(ctx context.Context, args ...any) bool {
+func (a *oauthAuthenticator) isTokenValid(ctx context.Context, args ...any) bool {
 	return a.oauthToken != nil && a.oauthToken.Valid()
 }
 
-func (a *Authenticator) isOauthContextPresent(ctx context.Context, args ...any) bool {
+func (a *oauthAuthenticator) isOauthContextPresent(ctx context.Context, args ...any) bool {
 	return a.ctx != nil
 }
 
 // oauth RedirectURL callback handler
-func (a *Authenticator) callbackHandler(w http.ResponseWriter, r *http.Request) {
+func (a *oauthAuthenticator) callbackHandler(w http.ResponseWriter, r *http.Request) {
 	code := r.URL.Query().Get("code")
 	token, err := a.conf.Exchange(a.ctx, code, oauth2.VerifierOption(a.verifier))
 	if err != nil {
