@@ -108,7 +108,7 @@ func (a *oauthAuthenticator) exchangeCode(ctx context.Context, args ...any) erro
 	// spin up server for callback from RedirectURL and shut it down once we get response
 	a.callback = make(chan *oauth2.Token)
 	mux := http.NewServeMux()
-	mux.HandleFunc("/gh-jira-changelog/oauth/callback", http.HandlerFunc(a.callbackHandler))
+	mux.HandleFunc("/gh-jira-changelog/oauth/callback", a.callbackHandler)
 	svr := http.Server{Addr: "127.0.0.1:9999", Handler: mux}
 	go func() { svr.ListenAndServe() }()
 
