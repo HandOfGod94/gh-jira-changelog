@@ -3,10 +3,10 @@ package jira
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"net/url"
 	"time"
 
+	"github.com/go-resty/resty/v2"
 	"golang.org/x/exp/slog"
 )
 
@@ -16,18 +16,13 @@ type Client interface {
 
 type client struct {
 	config     Config
-	httpClient *http.Client
+	httpClient *resty.Client
 }
 
 func (c *client) setupClient() {
-	c.httpClient = &http.Client{
-		Timeout: 5 * time.Second,
-	}
-}
-
-func (c *client) attachDefaultHeaders(r *http.Request) {
-	r.Header.Add("Accept", "application/json")
-	r.SetBasicAuth(c.config.User, c.config.ApiToken)
+	c.httpClient = resty.New()
+	c.httpClient.SetBasicAuth(c.config.User, c.config.ApiToken)
+	c.httpClient.SetTimeout(5 * time.Second)
 }
 
 func (c *client) FetchIssue(issueId string) (Issue, error) {
@@ -37,24 +32,13 @@ func (c *client) FetchIssue(issueId string) (Issue, error) {
 		return Issue{}, fmt.Errorf("failed to create request url. %w", err)
 	}
 
-	req, err := http.NewRequest("GET", requestUrl, nil)
-	if err != nil {
-		return Issue{}, fmt.Errorf("failed to create request. %w", err)
-	}
-	c.attachDefaultHeaders(req)
-
-	resp, err := c.httpClient.Do(req)
+	resp, err := c.httpClient.R().Get(requestUrl)
 	if err != nil {
 		return Issue{}, fmt.Errorf("failed to fetch issue. %w", err)
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return Issue{}, fmt.Errorf("failed to fetch issue. status code: %d", resp.StatusCode)
-	}
 
 	var issue Issue
-	if err := json.NewDecoder(resp.Body).Decode(&issue); err != nil {
+	if err := json.Unmarshal(resp.Body(), &issue); err != nil {
 		return Issue{}, fmt.Errorf("failed to decode issue. %w", err)
 	}
 
