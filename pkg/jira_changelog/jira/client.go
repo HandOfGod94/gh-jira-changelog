@@ -3,6 +3,7 @@ package jira
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
 	"time"
 
@@ -33,8 +34,8 @@ func (c *client) FetchIssue(issueId string) (Issue, error) {
 	}
 
 	resp, err := c.httpClient.R().Get(requestUrl)
-	if err != nil {
-		return Issue{}, fmt.Errorf("failed to fetch issue. %w", err)
+	if err != nil || resp.StatusCode() != http.StatusOK {
+		return Issue{}, fmt.Errorf("failed to fetch issue. code: %v, %w", resp.StatusCode(), err)
 	}
 
 	var issue Issue
