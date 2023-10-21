@@ -22,6 +22,7 @@ type client struct {
 
 func (c *client) setupClient() {
 	c.httpClient = resty.New()
+	c.httpClient.SetBaseURL(c.config.BaseURL)
 	c.httpClient.SetBasicAuth(c.config.User, c.config.ApiToken)
 	c.httpClient.SetTimeout(5 * time.Second)
 }

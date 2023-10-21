@@ -3,7 +3,9 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
 
+	"github.com/fatih/color"
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira/auth"
 	"github.com/spf13/cobra"
 )
@@ -22,8 +24,11 @@ as Atlassian currently doesn't support PKCE verification for oauth flow.`,
 		case "login":
 			a := auth.NewAuthenticator()
 			if err := a.Login(context.Background()); err != nil {
+				fmt.Fprintln(os.Stderr, color.RedString("Login attempt failed. Please try again"))
 				return err
 			}
+
+			fmt.Println(color.GreenString("Login successful"))
 		case "logout":
 			panic("To be implemented")
 		default:

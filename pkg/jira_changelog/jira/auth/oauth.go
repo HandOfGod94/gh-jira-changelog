@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/qmuntal/stateless"
 	"github.com/skratchdot/open-golang/open"
 	"golang.org/x/exp/slog"
@@ -20,20 +21,23 @@ const (
 	stateInit                        = "Init"
 	stateTokenObtained               = "TokenObtained"
 	stateAccessibleResourcesObtained = "AccessibleResourcesObtained"
+	stateJiraConfigSaved             = "JiraConfigSaved"
 
 	// events
 	triggerCodeExchange             = "CodeExchange"
 	triggerFetchAccessibleResources = "FetchAccessibleResources"
+	triggerPersistResourcesInfo     = "PersistResourcesInfo"
 )
 
 type oauthAuthenticator struct {
 	loginWorkflow *stateless.StateMachine
 
-	oauthToken *oauth2.Token
-	conf       *oauth2.Config
-	verifier   string
-	ctx        context.Context
-	callback   chan *oauth2.Token
+	oauthToken               *oauth2.Token
+	conf                     *oauth2.Config
+	verifier                 string
+	ctx                      context.Context
+	callback                 chan *oauth2.Token
+	allowedResourcesResponse []byte
 }
 
 func NewAuthenticator() *oauthAuthenticator {
@@ -62,7 +66,11 @@ func NewAuthenticator() *oauthAuthenticator {
 			a.isTokenValid, a.isOauthContextPresent)
 
 	loginWorkflow.Configure(stateAccessibleResourcesObtained).
-		OnEntry(a.fetchAccessibleResources)
+		OnEntry(a.fetchAccessibleResources).
+		Permit(triggerPersistResourcesInfo, stateJiraConfigSaved)
+
+	loginWorkflow.Configure(stateJiraConfigSaved).
+		OnEntry(a.saveJiraConfig)
 
 	a.loginWorkflow = loginWorkflow
 
@@ -75,6 +83,10 @@ func (a *oauthAuthenticator) Login(ctx context.Context) error {
 	}
 
 	if err := a.loginWorkflow.FireCtx(ctx, triggerFetchAccessibleResources); err != nil {
+		return err
+	}
+
+	if err := a.loginWorkflow.FireCtx(ctx, triggerPersistResourcesInfo); err != nil {
 		return err
 	}
 	return nil
@@ -92,8 +104,8 @@ func (a *oauthAuthenticator) exchangeCode(ctx context.Context, args ...any) erro
 		oauth2.SetAuthURLParam("audience", "api.atlassian.com"),
 	)
 
-	slog.Info("You will now be taken to browser for authentication.")
-	slog.Info("Please grant permission to access jira issues")
+	fmt.Println(color.CyanString("You will now be taken to browser for authentication."))
+	fmt.Println(color.CyanString("Please grant permission to access jira issues"))
 
 	time.Sleep(1 * time.Second)
 	open.Run(url)
@@ -132,6 +144,21 @@ func (a *oauthAuthenticator) fetchAccessibleResources(ctx context.Context, args 
 	}
 	slog.Debug("Retrieved accessible resources successfully", "resources", string(accessibleResources))
 
+	a.allowedResourcesResponse = accessibleResources
+
+	return nil
+}
+
+func (a *oauthAuthenticator) saveJiraConfig(ctx context.Context, args ...any) error {
+	resources, err := parseResources(a.allowedResourcesResponse)
+	if err != nil {
+		return err
+	}
+
+	err = resources[0].Save()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
