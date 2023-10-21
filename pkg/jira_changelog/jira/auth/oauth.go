@@ -18,12 +18,10 @@ import (
 const (
 	// states
 	stateInit                        = "Init"
-	stateOauthConfigSetup            = "OauthConfigSetup"
 	stateTokenObtained               = "TokenObtained"
 	stateAccessibleResourcesObtained = "AccessibleResourcesObtained"
 
 	// events
-	triggerSetupOauthConfig         = "SetupOauthConfig"
 	triggerCodeExchange             = "CodeExchange"
 	triggerFetchAccessibleResources = "FetchAccessibleResources"
 )
@@ -41,17 +39,27 @@ type oauthAuthenticator struct {
 func NewAuthenticator() *oauthAuthenticator {
 	a := &oauthAuthenticator{}
 
+	a.conf = &oauth2.Config{
+		ClientID:     "OOGf9PTJL0hGGC5hWD17G6OkiGKjO0FG",
+		ClientSecret: "ATOAhihA9MN3TOWAJEC4DxxPZMxGyjmA_mH8rUtSGXRIoUP6WQ3UvjCk5Mtx9TUBH6JF089B37D6",
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  "https://auth.atlassian.com/authorize",
+			TokenURL: "https://auth.atlassian.com/oauth/token",
+		},
+		RedirectURL: "http://127.0.0.1:9999/gh-jira-changelog/oauth/callback",
+		Scopes:      []string{"read:jira-work"},
+	}
+
+	a.verifier = oauth2.GenerateVerifier()
+
 	loginWorkflow := stateless.NewStateMachine(stateInit)
 	loginWorkflow.Configure(stateInit).
-		Permit(triggerSetupOauthConfig, stateOauthConfigSetup)
-
-	loginWorkflow.Configure(stateOauthConfigSetup).
-		OnEntry(a.setupOauthConfig).
 		Permit(triggerCodeExchange, stateTokenObtained, a.isVerifierPresent)
 
 	loginWorkflow.Configure(stateTokenObtained).
 		OnEntry(a.exchangeCode).
-		Permit(triggerFetchAccessibleResources, stateAccessibleResourcesObtained, a.isTokenValid, a.isOauthContextPresent)
+		Permit(triggerFetchAccessibleResources, stateAccessibleResourcesObtained,
+			a.isTokenValid, a.isOauthContextPresent)
 
 	loginWorkflow.Configure(stateAccessibleResourcesObtained).
 		OnEntry(a.fetchAccessibleResources)
@@ -62,8 +70,6 @@ func NewAuthenticator() *oauthAuthenticator {
 }
 
 func (a *oauthAuthenticator) Login(ctx context.Context) error {
-	a.loginWorkflow.Fire(triggerSetupOauthConfig)
-
 	if err := a.loginWorkflow.FireCtx(ctx, triggerCodeExchange); err != nil {
 		return err
 	}
@@ -79,24 +85,6 @@ func (a *oauthAuthenticator) Client() *http.Client {
 }
 
 // ActionFuncs
-func (a *oauthAuthenticator) setupOauthConfig(ctx context.Context, args ...any) error {
-	a.conf = &oauth2.Config{
-		ClientID:     "OOGf9PTJL0hGGC5hWD17G6OkiGKjO0FG",
-		ClientSecret: "ATOAhihA9MN3TOWAJEC4DxxPZMxGyjmA_mH8rUtSGXRIoUP6WQ3UvjCk5Mtx9TUBH6JF089B37D6",
-		Endpoint: oauth2.Endpoint{
-			AuthURL:  "https://auth.atlassian.com/authorize",
-			TokenURL: "https://auth.atlassian.com/oauth/token",
-		},
-		RedirectURL: "http://127.0.0.1:9999/gh-jira-changelog/oauth/callback",
-		Scopes:      []string{"read:jira-work"},
-	}
-
-	a.verifier = oauth2.GenerateVerifier()
-
-	slog.Info("Configured oauth")
-	return nil
-}
-
 func (a *oauthAuthenticator) exchangeCode(ctx context.Context, args ...any) error {
 	url := a.conf.AuthCodeURL("state", oauth2.S256ChallengeOption(a.verifier),
 		oauth2.SetAuthURLParam("response_type", "code"),
