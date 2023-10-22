@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira/config"
+	config "github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira/config_service"
 )
 
 type Token struct {

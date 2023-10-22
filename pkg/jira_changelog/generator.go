@@ -6,20 +6,19 @@ import (
 
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/git"
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira"
-	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira/config"
 	"github.com/samber/lo"
 	"golang.org/x/exp/slog"
 )
 
 type Generator struct {
-	JiraConfig config.Config
+	JiraConfig jira.Context
 	fromRef    string
 	toRef      string
 	repoURL    string
 	client     jira.Client
 }
 
-func NewGenerator(jiraConfig config.Config, fromRef, toRef, repoURL string) *Generator {
+func NewGenerator(jiraConfig jira.Context, fromRef, toRef, repoURL string) *Generator {
 	client := jira.NewClient(jiraConfig)
 	g := &Generator{
 		JiraConfig: jiraConfig,

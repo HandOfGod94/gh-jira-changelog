@@ -1,6 +1,6 @@
-package config
+package jira
 
-type Config struct {
+type Context struct {
 	BaseURL  string
 	User     string
 	ApiToken string

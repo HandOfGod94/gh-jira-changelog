@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira/config"
 	"golang.org/x/exp/slog"
 )
 
@@ -17,7 +16,7 @@ type Client interface {
 }
 
 type client struct {
-	config     config.Config
+	config     Context
 	httpClient *resty.Client
 }
 
@@ -48,7 +47,7 @@ func (c *client) FetchIssue(issueId string) (Issue, error) {
 	return issue, nil
 }
 
-func NewClient(config config.Config) Client {
+func NewClient(config Context) Client {
 	c := &client{config: config}
 	c.setupClient()
 	return c

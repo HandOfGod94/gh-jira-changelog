@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog"
-	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira/config"
+	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -77,7 +77,7 @@ gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 		defer cancel()
 
 		changelog := jira_changelog.NewGenerator(
-			config.Config{
+			jira.Context{
 				BaseURL:  viper.GetString("base_url"),
 				ApiToken: viper.GetString("api_token"),
 				User:     viper.GetString("email_id"),
