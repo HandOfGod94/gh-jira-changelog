@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/go-resty/resty/v2"
 	"golang.org/x/exp/slog"
@@ -16,19 +15,12 @@ type Client interface {
 }
 
 type client struct {
-	config     Context
+	jiraCtx    *Context
 	httpClient *resty.Client
 }
 
-func (c *client) setupClient() {
-	c.httpClient = resty.New()
-	c.httpClient.SetBaseURL(c.config.BaseURL)
-	c.httpClient.SetBasicAuth(c.config.User, c.config.ApiToken)
-	c.httpClient.SetTimeout(5 * time.Second)
-}
-
 func (c *client) FetchIssue(issueId string) (Issue, error) {
-	requestUrl, err := url.JoinPath(c.config.BaseURL, "rest", "api", "3", "issue", issueId)
+	requestUrl, err := url.JoinPath(c.jiraCtx.BaseURL(), "rest", "api", "3", "issue", issueId)
 	slog.Debug("Preparing fetch request", "url", requestUrl)
 	if err != nil {
 		return Issue{}, fmt.Errorf("failed to create request url. %w", err)
@@ -36,6 +28,7 @@ func (c *client) FetchIssue(issueId string) (Issue, error) {
 
 	resp, err := c.httpClient.R().Get(requestUrl)
 	if err != nil || resp.StatusCode() != http.StatusOK {
+		slog.Warn("failed to fetch issue", "code", resp.StatusCode(), "error", err)
 		return Issue{}, fmt.Errorf("failed to fetch issue. code: %v, %w", resp.StatusCode(), err)
 	}
 
@@ -47,8 +40,8 @@ func (c *client) FetchIssue(issueId string) (Issue, error) {
 	return issue, nil
 }
 
-func NewClient(config Context) Client {
-	c := &client{config: config}
-	c.setupClient()
+func NewClient(jiraCtx *Context) Client {
+	c := &client{jiraCtx: jiraCtx}
+	c.httpClient = jiraCtx.Client()
 	return c
 }

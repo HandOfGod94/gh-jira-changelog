@@ -2,6 +2,7 @@ package oauth
 
 import (
 	"encoding/json"
+	"fmt"
 
 	config "github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira/config_service"
 )
@@ -27,4 +28,14 @@ func parseResources(raw []byte) ([]Resource, error) {
 	}
 
 	return result, nil
+}
+
+func LoadResource() (*Resource, error) {
+	res := &Resource{}
+	err := config.Load(res, ResourcesFile)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load resources: %w", err)
+	}
+
+	return res, nil
 }

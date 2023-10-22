@@ -4,14 +4,11 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"net/url"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog"
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira"
-	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/exp/slog"
@@ -22,7 +19,6 @@ var (
 	toRef          string
 	writeTo        string
 	DefaultTimeout = 10 * time.Second
-	requiredFlags  = []string{"base_url", "email_id", "api_token", "repo_url"}
 )
 
 var generateCmd = &cobra.Command{
@@ -53,21 +49,10 @@ gh-jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 # assuming jira plugin installed
 gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0" --to="v0.2.0"`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		unsetFlags := lo.Filter(requiredFlags, func(flag string, index int) bool { return !viper.IsSet(flag) })
-		if len(unsetFlags) > 0 {
-			unsetFlagsStr := strings.Join(unsetFlags, ", ")
-			return fmt.Errorf(`required flag "%s" not set`, unsetFlagsStr)
-		}
-
 		apiToken := viper.GetString("api_token")
 		emailID := viper.GetString("email_id")
 		if apiToken != "" && emailID == "" {
 			return fmt.Errorf("valid email_id is required with api_token config")
-		}
-
-		_, err := url.Parse(viper.GetString("base_url"))
-		if err != nil {
-			return err
 		}
 
 		return nil
@@ -77,11 +62,11 @@ gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 		defer cancel()
 
 		changelog := jira_changelog.NewGenerator(
-			jira.Context{
-				BaseURL:  viper.GetString("base_url"),
-				ApiToken: viper.GetString("api_token"),
-				User:     viper.GetString("email_id"),
-			},
+			jira.NewContext(jira.Options{
+				jira.BaseURL:  viper.GetString("base_url"),
+				jira.ApiToken: viper.GetString("api_token"),
+				jira.User:     viper.GetString("email_id"),
+			}),
 			fromRef,
 			toRef,
 			viper.GetString("repo_url"),

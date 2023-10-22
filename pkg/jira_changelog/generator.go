@@ -11,17 +11,17 @@ import (
 )
 
 type Generator struct {
-	JiraConfig jira.Context
+	JiraConfig *jira.Context
 	fromRef    string
 	toRef      string
 	repoURL    string
 	client     jira.Client
 }
 
-func NewGenerator(jiraConfig jira.Context, fromRef, toRef, repoURL string) *Generator {
-	client := jira.NewClient(jiraConfig)
+func NewGenerator(jiraCtx *jira.Context, fromRef, toRef, repoURL string) *Generator {
+	client := jira.NewClient(jiraCtx)
 	g := &Generator{
-		JiraConfig: jiraConfig,
+		JiraConfig: jiraCtx,
 		fromRef:    fromRef,
 		toRef:      toRef,
 		repoURL:    repoURL,
