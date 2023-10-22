@@ -18,15 +18,15 @@ import (
 
 const (
 	// states
-	stateInit                        = "Init"
-	stateTokenObtained               = "TokenObtained"
-	stateAccessibleResourcesObtained = "AccessibleResourcesObtained"
-	stateJiraConfigSaved             = "JiraConfigSaved"
+	stateInit                       = "Init"
+	stateTokenConfigured            = "TokenConfigured"
+	stateAllowedResourcesConfigured = "AllowedResourcesConfigured"
 
 	// events
-	triggerCodeExchange             = "CodeExchange"
-	triggerFetchAccessibleResources = "FetchAccessibleResources"
-	triggerPersistResourcesInfo     = "PersistResourcesInfo"
+	triggerCodeExchange          = "CodeExchange"
+	triggerSaveToken             = "SaveToken"
+	triggerFetchAllowedResources = "FetchAccessibleResources"
+	triggerPersistResourcesInfo  = "PersistResourcesInfo"
 )
 
 type oauthAuthenticator struct {
@@ -58,19 +58,18 @@ func NewAuthenticator() *oauthAuthenticator {
 
 	loginWorkflow := stateless.NewStateMachine(stateInit)
 	loginWorkflow.Configure(stateInit).
-		Permit(triggerCodeExchange, stateTokenObtained, a.isVerifierPresent)
+		Permit(triggerCodeExchange, stateTokenConfigured, a.isVerifierPresent)
 
-	loginWorkflow.Configure(stateTokenObtained).
-		OnEntry(a.exchangeCode).
-		Permit(triggerFetchAccessibleResources, stateAccessibleResourcesObtained,
-			a.isTokenValid, a.isOauthContextPresent)
+	loginWorkflow.Configure(stateTokenConfigured).
+		OnEntryFrom(triggerCodeExchange, a.exchangeCode).
+		OnEntryFrom(triggerSaveToken, a.saveToken).
+		Permit(triggerFetchAllowedResources, stateAllowedResourcesConfigured, a.isTokenValid, a.isOauthContextPresent).
+		PermitReentry(triggerSaveToken, a.isTokenValid)
 
-	loginWorkflow.Configure(stateAccessibleResourcesObtained).
-		OnEntry(a.fetchAccessibleResources).
-		Permit(triggerPersistResourcesInfo, stateJiraConfigSaved)
-
-	loginWorkflow.Configure(stateJiraConfigSaved).
-		OnEntry(a.saveJiraConfig)
+	loginWorkflow.Configure(stateAllowedResourcesConfigured).
+		OnEntryFrom(triggerFetchAllowedResources, a.fetchAccessibleResources).
+		OnEntryFrom(triggerPersistResourcesInfo, a.saveJiraConfig).
+		PermitReentry(triggerPersistResourcesInfo)
 
 	a.loginWorkflow = loginWorkflow
 
@@ -82,7 +81,11 @@ func (a *oauthAuthenticator) Login(ctx context.Context) error {
 		return err
 	}
 
-	if err := a.loginWorkflow.FireCtx(ctx, triggerFetchAccessibleResources); err != nil {
+	if err := a.loginWorkflow.FireCtx(ctx, triggerSaveToken); err != nil {
+		return err
+	}
+
+	if err := a.loginWorkflow.FireCtx(ctx, triggerFetchAllowedResources); err != nil {
 		return err
 	}
 
@@ -127,6 +130,17 @@ func (a *oauthAuthenticator) exchangeCode(ctx context.Context, args ...any) erro
 	a.oauthToken = <-a.callback
 	svr.Shutdown(a.ctx)
 	return nil
+}
+
+func (a *oauthAuthenticator) saveToken(ctx context.Context, args ...any) error {
+
+	token := Token{
+		AccessToken:  a.oauthToken.AccessToken,
+		RefreshToken: a.oauthToken.RefreshToken,
+		ExpiresIn:    a.oauthToken.Expiry,
+	}
+
+	return token.Save()
 }
 
 func (a *oauthAuthenticator) fetchAccessibleResources(ctx context.Context, args ...any) error {

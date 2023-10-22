@@ -20,16 +20,9 @@ type Resource struct {
 
 func (r Resource) Save() error {
 
-	confdir, err := DefaultConfDir()
+	confdir, err := getOrCreateConfDir()
 	if err != nil {
-		return fmt.Errorf("failed to generate config file %w", err)
-	}
-
-	if _, err := os.Stat(confdir); os.IsNotExist(err) {
-		err = os.Mkdir(confdir, os.ModeDir|0755)
-		if err != nil {
-			return err
-		}
+		return fmt.Errorf("failed to get config dir %w", err)
 	}
 
 	filepath := path.Join(confdir, ResourcesFile)
@@ -69,4 +62,19 @@ func DefaultConfDir() (res string, err error) {
 	}
 
 	return path.Join(res, filepath), nil
+}
+
+func getOrCreateConfDir() (string, error) {
+	confdir, err := DefaultConfDir()
+	if err != nil {
+		return "", fmt.Errorf("failed to generate config file %w", err)
+	}
+
+	if _, err := os.Stat(confdir); os.IsNotExist(err) {
+		err = os.Mkdir(confdir, os.ModeDir|0755)
+		if err != nil {
+			return "", err
+		}
+	}
+	return confdir, nil
 }
