@@ -1,11 +1,9 @@
 package auth
 
 import (
-	"encoding/json"
-	"fmt"
-	"os"
-	"path"
 	"time"
+
+	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira/config"
 )
 
 type Token struct {
@@ -17,23 +15,5 @@ type Token struct {
 const TokenFile = "token.json"
 
 func (t *Token) Save() error {
-	confdir, err := getOrCreateConfDir()
-	if err != nil {
-		return fmt.Errorf("failed to get config dir for saving token. %w", err)
-	}
-
-	filepath := path.Join(confdir, TokenFile)
-	f, err := os.OpenFile(filepath, os.O_CREATE|os.O_WRONLY, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	enc := json.NewEncoder(f)
-	err = enc.Encode(t)
-	if err != nil {
-		return fmt.Errorf("failed to encode resources to json. %w", err)
-	}
-
-	return nil
+	return config.Save(t, TokenFile)
 }
