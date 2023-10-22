@@ -1,4 +1,4 @@
-package auth
+package api_token
 
 import "net/http"
 

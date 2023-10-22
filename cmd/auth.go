@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/fatih/color"
-	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira/auth"
+	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira/auth/oauth"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +22,7 @@ as Atlassian currently doesn't support PKCE verification for oauth flow.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		switch args[0] {
 		case "login":
-			a := auth.NewAuthenticator()
+			a := oauth.NewAuthenticator()
 			if err := a.Login(context.Background()); err != nil {
 				fmt.Fprintln(os.Stderr, color.RedString("Login attempt failed. Please try again"))
 				return err
