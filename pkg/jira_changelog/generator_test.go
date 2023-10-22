@@ -7,6 +7,7 @@ import (
 	"github.com/handofgod94/gh-jira-changelog/mocks"
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/git"
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira"
+	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira/config"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -34,7 +35,7 @@ func TestFetchJiraIssuesEvent(t *testing.T) {
 	mockedClient.On("FetchIssue", "TEST-4546").Return(want[1], nil).Twice()
 	mockedClient.On("FetchIssue", "TEST-12345").Return(want[2], nil)
 
-	generator := NewGenerator(jira.Config{}, "fromRef", "toRef", "http://example-repo.com")
+	generator := NewGenerator(config.Config{}, "fromRef", "toRef", "http://example-repo.com")
 	generator.client = mockedClient
 
 	got, err := generator.fetchJiraIssues(commits)

@@ -6,17 +6,14 @@ import (
 	"os"
 
 	"github.com/fatih/color"
-	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira/auth/oauth"
+	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira/oauth"
 	"github.com/spf13/cobra"
 )
 
 var authCmd = &cobra.Command{
-	Use:   "auth",
-	Short: "Authenticate wit jira",
-	Long: `Authorize CLI with Jira, so that it can fetch data from Jira.
-
-Note: It's recommended to use API token instead of authenticating with oauth from CLI,
-as Atlassian currently doesn't support PKCE verification for oauth flow.`,
+	Use:       "auth",
+	Short:     "Authenticate wit jira",
+	Long:      `Authorize CLI with Jira using oauth, so that it can fetch data from Jira.`,
 	ValidArgs: []string{"login", "logout"},
 	Args:      cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
 	RunE: func(cmd *cobra.Command, args []string) error {

@@ -9,7 +9,7 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
-func Save(content any, filepath string) error {
+func Save(v any, filepath string) error {
 	confdir, err := getOrCreateConfDir()
 	if err != nil {
 		return fmt.Errorf("failed to get config dir for saving token. %w", err)
@@ -23,9 +23,31 @@ func Save(content any, filepath string) error {
 	defer f.Close()
 
 	enc := json.NewEncoder(f)
-	err = enc.Encode(content)
+	err = enc.Encode(v)
 	if err != nil {
 		return fmt.Errorf("failed to encode resources to json. %w", err)
+	}
+
+	return nil
+}
+
+func Load(v any, filepath string) (err error) {
+	confdir, err := defaultConfDir()
+	if err != nil {
+		return
+	}
+
+	filepath = path.Join(confdir, filepath)
+	f, err := os.OpenFile(filepath, os.O_RDONLY, os.ModePerm)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+
+	dec := json.NewDecoder(f)
+	err = dec.Decode(v)
+	if err != nil {
+		return
 	}
 
 	return nil

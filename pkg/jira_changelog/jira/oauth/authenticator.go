@@ -95,10 +95,6 @@ func (a *oauthAuthenticator) Login(ctx context.Context) error {
 	return nil
 }
 
-func (a *oauthAuthenticator) Client() *http.Client {
-	return a.conf.Client(a.ctx, a.oauthToken)
-}
-
 // ActionFuncs
 func (a *oauthAuthenticator) exchangeCode(ctx context.Context, args ...any) error {
 	url := a.conf.AuthCodeURL("state", oauth2.S256ChallengeOption(a.verifier),
@@ -144,7 +140,7 @@ func (a *oauthAuthenticator) saveToken(ctx context.Context, args ...any) error {
 }
 
 func (a *oauthAuthenticator) fetchAccessibleResources(ctx context.Context, args ...any) error {
-	resp, err := a.Client().Get("https://api.atlassian.com/oauth/token/accessible-resources")
+	resp, err := a.conf.Client(a.ctx, a.oauthToken).Get("https://api.atlassian.com/oauth/token/accessible-resources")
 	if err != nil || resp.StatusCode != http.StatusOK {
 		slog.Error("Failed to fetch accessible-resource from jira", "error", err)
 		slog.Error("Response information", "response_status", resp.Status)
