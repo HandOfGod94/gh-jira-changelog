@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
-	"regexp"
 	"time"
 )
 
@@ -13,8 +12,6 @@ type Commit struct {
 	Time    time.Time
 	Sha     string
 }
-
-var gitoutputPattern = regexp.MustCompile(`^\((\d+)\)\s+\{(\w+)\}\s*(.*)`)
 
 type commitPopulator struct {
 	fromRef string

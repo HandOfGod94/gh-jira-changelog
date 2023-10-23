@@ -2,12 +2,15 @@ package git
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
 	"golang.org/x/exp/slog"
 )
+
+var gitoutputPattern = regexp.MustCompile(`^\((\d+)\)\s+\{(\w+)\}\s*(.*)`)
 
 type GitOutput string
 
