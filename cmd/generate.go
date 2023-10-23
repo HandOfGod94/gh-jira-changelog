@@ -57,7 +57,7 @@ gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 
 		return nil
 	},
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx, cancel := context.WithTimeout(context.Background(), DefaultTimeout)
 		defer cancel()
 
@@ -75,6 +75,8 @@ gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 		slog.Info("Generating changelog", "JiraConfig", changelog.JiraConfig,
 			"From", fromRef, "To", toRef, "repoURL", viper.GetString("repo_url"))
 		changelog.Generate(ctx).Render(writer(writeTo))
+
+		return nil
 	},
 }
 

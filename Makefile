@@ -1,7 +1,7 @@
 APP_NAME=gh-jira-changelog
 EXTENSION_NAME=jira-changelog
 
-all: clean fmt tidy quality-check build install
+all: clean fmt tidy build install quality-check
 
 clean:
 	rm -f $(APP_NAME)
