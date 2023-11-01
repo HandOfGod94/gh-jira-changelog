@@ -1,40 +1,40 @@
-package git_test
+package messages_test
 
 import (
 	"testing"
 	"time"
 
-	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/git"
+	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/messages"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCommits(t *testing.T) {
 	testCases := []struct {
 		desc      string
-		gitOutput git.GitOutput
-		want      []git.Commit
+		gitOutput messages.GitOutput
+		want      []messages.Commit
 		wantErr   bool
 	}{
 		{
 			desc: "returns commits when gitoutput is valid",
-			gitOutput: git.GitOutput(`
+			gitOutput: messages.GitOutput(`
 (1687839814) {3cefgdr} use extra space while generating template
 (1688059937) {4567uge}  [JIRA-123] refactor: extract out structs from jira/types
 (1687799347) {3456cdw} add warning emoji for changelog lineitem
 			`),
-			want: []git.Commit{
+			want: []messages.Commit{
 				{
-					Message: "use extra space while generating template",
+					Summary: "use extra space while generating template",
 					Time:    time.Unix(1687839814, 0),
 					Sha:     "3cefgdr",
 				},
 				{
-					Message: "[JIRA-123] refactor: extract out structs from jira/types",
+					Summary: "[JIRA-123] refactor: extract out structs from jira/types",
 					Time:    time.Unix(1688059937, 0),
 					Sha:     "4567uge",
 				},
 				{
-					Message: "add warning emoji for changelog lineitem",
+					Summary: "add warning emoji for changelog lineitem",
 					Time:    time.Unix(1687799347, 0),
 					Sha:     "3456cdw",
 				},
@@ -42,19 +42,19 @@ func TestCommits(t *testing.T) {
 		},
 		{
 			desc: "returns single commit if gitoutput has single line",
-			gitOutput: git.GitOutput(`
+			gitOutput: messages.GitOutput(`
 (1688059937) {3456cdw} refactor: extract out structs from jira/types
 `),
-			want: []git.Commit{{Message: "refactor: extract out structs from jira/types", Time: time.Unix(1688059937, 0), Sha: "3456cdw"}},
+			want: []messages.Commit{{Summary: "refactor: extract out structs from jira/types", Time: time.Unix(1688059937, 0), Sha: "3456cdw"}},
 		},
 		{
 			desc:      "returns error when output is not in correct format",
-			gitOutput: git.GitOutput(`foobar`),
+			gitOutput: messages.GitOutput(`foobar`),
 			wantErr:   true,
 		},
 		{
 			desc:      "returns error when output is empty",
-			gitOutput: git.GitOutput(""),
+			gitOutput: messages.GitOutput(""),
 			wantErr:   true,
 		},
 	}

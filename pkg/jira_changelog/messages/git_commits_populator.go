@@ -1,4 +1,4 @@
-package git
+package messages
 
 import (
 	"context"
@@ -8,9 +8,13 @@ import (
 )
 
 type Commit struct {
-	Message string
+	Summary string
 	Time    time.Time
 	Sha     string
+}
+
+func (c *Commit) Message() string {
+	return c.Summary
 }
 
 type commitPopulator struct {
@@ -18,7 +22,7 @@ type commitPopulator struct {
 	toRef   string
 }
 
-func NewCommitPopulator(fromRef, toRef string) *commitPopulator {
+func NewCommitPopulator(fromRef, toRef string) Populator {
 	cpw := &commitPopulator{
 		fromRef: fromRef,
 		toRef:   toRef,
@@ -26,15 +30,15 @@ func NewCommitPopulator(fromRef, toRef string) *commitPopulator {
 	return cpw
 }
 
-func (cpw *commitPopulator) Commits(ctx context.Context) ([]Commit, error) {
+func (cpw *commitPopulator) Populate(ctx context.Context) ([]Message, error) {
 	gitOutput, err := execGitLog(ctx, cpw.fromRef, cpw.toRef)
 	if err != nil {
-		return []Commit{}, fmt.Errorf("failed to execute git log. %w", err)
+		return nil, fmt.Errorf("failed to execute git log. %w", err)
 	}
 
 	commits, err := gitOutput.Commits()
 	if err != nil {
-		return []Commit{}, fmt.Errorf("failed to parse output. %w", err)
+		return nil, fmt.Errorf("failed to parse output. %w", err)
 	}
 
 	return commits, nil
