@@ -1,4 +1,4 @@
-package git
+package messages
 
 import (
 	"fmt"
@@ -37,7 +37,7 @@ func (gt GitOutput) Commits() ([]Commit, error) {
 		}
 
 		commits = append(commits, Commit{
-			Message: message,
+			Summary: message,
 			Time:    commitTime,
 			Sha:     sha,
 		})
