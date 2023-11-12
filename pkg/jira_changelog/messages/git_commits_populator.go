@@ -27,12 +27,12 @@ type commitPopulator struct {
 	toRef   string
 }
 
-func NewCommitPopulator(fromRef, toRef string) Populator {
+func NewCommitPopulator(fromRef, toRef string) (Populator, error) {
 	cpw := &commitPopulator{
 		fromRef: fromRef,
 		toRef:   toRef,
 	}
-	return cpw
+	return cpw, nil
 }
 
 func (cpw *commitPopulator) Populate(ctx context.Context) ([]Message, error) {

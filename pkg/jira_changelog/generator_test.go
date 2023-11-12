@@ -35,7 +35,7 @@ func TestFetchJiraIssuesEvent(t *testing.T) {
 	mockedClient.On("FetchIssue", "TEST-4546").Return(want[1], nil).Twice()
 	mockedClient.On("FetchIssue", "TEST-12345").Return(want[2], nil)
 
-	generator := NewGenerator(jira.NewContext(nil), "fromRef", "toRef", "http://example-repo.com")
+	generator := NewGenerator(jira.NewClient(jira.NewContext(nil)), false, "fromRef", "toRef", "http://example-repo.com")
 	generator.client = mockedClient
 
 	changeMessages := lo.Map(commits, func(commit messages.Commit, i int) messages.Message { return commit })

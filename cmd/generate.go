@@ -18,6 +18,7 @@ var (
 	fromRef        string
 	toRef          string
 	writeTo        string
+	usePR          bool
 	DefaultTimeout = 10 * time.Second
 )
 
@@ -62,11 +63,12 @@ gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 		defer cancel()
 
 		changelog := jira_changelog.NewGenerator(
-			jira.NewContext(jira.Options{
+			jira.NewClient(jira.NewContext(jira.Options{
 				jira.BaseURL:  viper.GetString("base_url"),
 				jira.ApiToken: viper.GetString("api_token"),
 				jira.User:     viper.GetString("email_id"),
-			}),
+			})),
+			usePR,
 			fromRef,
 			toRef,
 			viper.GetString("repo_url"),
@@ -100,6 +102,7 @@ func writer(writeTo string) io.Writer {
 func init() {
 	generateCmd.Flags().StringVar(&fromRef, "from", "", "Git ref to start from")
 	generateCmd.Flags().StringVar(&toRef, "to", "main", "Git ref to end at")
+	generateCmd.Flags().BoolVar(&usePR, "use_pr", false, "use PR titles to generate changelog. Note: only works if used as gh plugin")
 	generateCmd.Flags().StringVar(&writeTo, "write_to", "/dev/stdout", "File stream to write the changelog")
 
 	generateCmd.MarkFlagRequired("from")
