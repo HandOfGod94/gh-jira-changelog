@@ -5,7 +5,12 @@ import (
 	"fmt"
 	"os/exec"
 	"time"
+
+	"github.com/samber/lo"
 )
+
+var _ Populator = &commitPopulator{}
+var _ Message = &Commit{}
 
 type Commit struct {
 	Summary string
@@ -13,7 +18,7 @@ type Commit struct {
 	Sha     string
 }
 
-func (c *Commit) Message() string {
+func (c Commit) Message() string {
 	return c.Summary
 }
 
@@ -41,7 +46,8 @@ func (cpw *commitPopulator) Populate(ctx context.Context) ([]Message, error) {
 		return nil, fmt.Errorf("failed to parse output. %w", err)
 	}
 
-	return commits, nil
+	messages := lo.Map(commits, func(commit Commit, i int) Message { return commit })
+	return messages, nil
 }
 
 func execGitLog(ctx context.Context, fromRef, toRef string) (GitOutput, error) {
