@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/fatih/color"
+	config "github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira/config_service"
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira/oauth"
 	"github.com/spf13/cobra"
 )
@@ -27,7 +28,12 @@ var authCmd = &cobra.Command{
 
 			fmt.Println(color.GreenString("Login successful"))
 		case "logout":
-			panic("To be implemented")
+			err := config.Clear()
+			if err != nil {
+				return err
+			}
+			fmt.Print(color.CyanString("Logged out successfully."))
+			return nil
 		default:
 			return fmt.Errorf("invalid argument %s", args[0])
 		}

@@ -7,6 +7,7 @@ import (
 	"path"
 
 	"github.com/mitchellh/go-homedir"
+	"golang.org/x/exp/slog"
 )
 
 func Save(v any, filepath string) error {
@@ -48,6 +49,22 @@ func Load(v any, filepath string) (err error) {
 	err = dec.Decode(v)
 	if err != nil {
 		return
+	}
+
+	return nil
+}
+
+func Clear() error {
+	confdir, err := defaultConfDir()
+	if err != nil {
+		return err
+	}
+
+	slog.Info("clearing config dir", "Dir", confdir)
+
+	if err := os.RemoveAll(confdir); err != nil {
+		slog.Error("failed to delete conf dir", "error", err)
+		return err
 	}
 
 	return nil
