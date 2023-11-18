@@ -48,7 +48,10 @@ gh-jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 
 # Using it as GH plugin
 # assuming jira plugin installed
-gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0" --to="v0.2.0"`,
+gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0" --to="v0.2.0"
+
+# using PR titles to generate changelog
+gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0" --to="v0.2.0" --use_pr`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		apiToken := viper.GetString("api_token")
 		emailID := viper.GetString("email_id")
