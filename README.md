@@ -98,17 +98,21 @@ gh-jira-changelog generate --config="<path-to-config-file>.yaml" --from=<git-ref
 BASE_URL=<you-atlassian-url> API_TOKEN=<jira-api-token> gh-jira-changelog generate --from=<git-ref> --to=<git-ref>
 
 # generating changelog between 2 git tags
-gh-jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0" --to="v0.3.0"
+gh-jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0" --to="v0.2.0"
 
 
 # Using it as GH plugin
 # assuming jira plugin installed
-gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0" --to="v0.3.0"
+gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0" --to="v0.2.0"
+
+# using PR titles to generate changelog
+gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0" --to="v0.2.0" --use_pr
 
 Flags:
       --from string       Git ref to start from
   -h, --help              help for generate
       --to string         Git ref to end at (default "main")
+      --use_pr            use PR titles to generate changelog. Note: only works if used as gh plugin
       --write_to string   File stream to write the changelog (default "/dev/stdout")
 
 Global Flags:
