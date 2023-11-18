@@ -10,6 +10,8 @@ import (
 	"golang.org/x/exp/slog"
 )
 
+const configDirName = "gh-jira-changelog"
+
 func Save(v any, filepath string) error {
 	confdir, err := getOrCreateConfDir()
 	if err != nil {
@@ -70,17 +72,17 @@ func Clear() error {
 	return nil
 }
 
-func defaultConfDir() (res string, err error) {
-	filepath := path.Join("gh-jira-changelog")
-	res = os.Getenv("XDG_CONFIG_HOME")
-	if res == "" {
-		res, err = homedir.Dir()
+func defaultConfDir() (string, error) {
+	userDefaultConfLocation := os.Getenv("XDG_CONFIG_HOME")
+	if userDefaultConfLocation == "" {
+		dir, err := homedir.Dir()
 		if err != nil {
-			return
+			return "", err
 		}
+		return path.Join(dir, "."+configDirName), nil
 	}
 
-	return path.Join(res, filepath), nil
+	return path.Join(userDefaultConfLocation, configDirName), nil
 }
 
 func getOrCreateConfDir() (string, error) {

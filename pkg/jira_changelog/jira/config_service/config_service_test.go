@@ -21,7 +21,7 @@ func TestDefaultDir_When_XDG_CONFIG_HOME_isNotSet(t *testing.T) {
 	os.Unsetenv("XDG_CONFIG_HOME")
 
 	homeDir, _ := homedir.Dir()
-	expected := path.Join(homeDir, "gh-jira-changelog")
+	expected := path.Join(homeDir, ".gh-jira-changelog")
 
 	got, err := defaultConfDir()
 
