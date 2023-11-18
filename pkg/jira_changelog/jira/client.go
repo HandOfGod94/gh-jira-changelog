@@ -15,12 +15,12 @@ type Client interface {
 }
 
 type client struct {
-	jiraCtx    *Context
+	clientOpts *ClientOptions
 	httpClient *resty.Client
 }
 
 func (c *client) FetchIssue(issueId string) (Issue, error) {
-	requestUrl, err := url.JoinPath(c.jiraCtx.BaseURL(), "rest", "api", "3", "issue", issueId)
+	requestUrl, err := url.JoinPath(c.clientOpts.BaseURL(), "rest", "api", "3", "issue", issueId)
 	slog.Debug("Preparing fetch request", "url", requestUrl)
 	if err != nil {
 		return Issue{}, fmt.Errorf("failed to create request url. %w", err)
@@ -40,8 +40,8 @@ func (c *client) FetchIssue(issueId string) (Issue, error) {
 	return issue, nil
 }
 
-func NewClient(jiraCtx *Context) Client {
-	c := &client{jiraCtx: jiraCtx}
-	c.httpClient = jiraCtx.Client()
+func NewClient(clientOpts *ClientOptions) Client {
+	c := &client{clientOpts: clientOpts}
+	c.httpClient = clientOpts.Client()
 	return c
 }

@@ -9,7 +9,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-type Context struct {
+type ClientOptions struct {
 	baseURL    string
 	user       string
 	apiToken   string
@@ -27,8 +27,8 @@ const (
 	ApiToken Option = "api_token"
 )
 
-func NewContext(opts Options) *Context {
-	c := &Context{
+func NewClientOptions(opts Options) *ClientOptions {
+	c := &ClientOptions{
 		baseURL:  opts[BaseURL],
 		user:     opts[User],
 		apiToken: opts[ApiToken],
@@ -53,7 +53,7 @@ func NewContext(opts Options) *Context {
 	return c
 }
 
-func (c *Context) BaseURL() string {
+func (c *ClientOptions) BaseURL() string {
 	if c.useOauth {
 		res, err := url.JoinPath("https://api.atlassian.com", "ex", "jira", c.resource.CloudId)
 		if err != nil {
@@ -65,7 +65,7 @@ func (c *Context) BaseURL() string {
 	return c.baseURL
 }
 
-func (c *Context) Client() *resty.Client {
+func (c *ClientOptions) Client() *resty.Client {
 	client := resty.New()
 
 	if c.useOauth {

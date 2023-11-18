@@ -10,12 +10,11 @@ import (
 )
 
 type Generator struct {
-	JiraConfig *jira.Context
-	fromRef    string
-	toRef      string
-	repoURL    string
-	client     jira.Client
-	usePR      bool
+	fromRef string
+	toRef   string
+	repoURL string
+	client  jira.Client
+	usePR   bool
 }
 
 func NewGenerator(client jira.Client, usePR bool, fromRef, toRef, repoURL string) *Generator {
@@ -47,7 +46,7 @@ func (c *Generator) Generate(ctx context.Context) *Changelog {
 	return NewChangelog(c.fromRef, c.toRef, c.repoURL, issuesByEpic)
 }
 
-func (c *Generator) fetchJiraIssues(commits []messages.Message) ([]jira.Issue, error) {
+func (c *Generator) fetchJiraIssues(commits []messages.Messager) ([]jira.Issue, error) {
 	slog.Debug("Total commit messages", "count", len(commits))
 
 	jiraIssues := make([]jira.Issue, 0)
@@ -64,7 +63,7 @@ func (c *Generator) fetchJiraIssues(commits []messages.Message) ([]jira.Issue, e
 	return lo.Uniq(jiraIssues), nil
 }
 
-func (c *Generator) fetchJiraIssue(commit messages.Message) (jira.Issue, error) {
+func (c *Generator) fetchJiraIssue(commit messages.Messager) (jira.Issue, error) {
 	issueId := jira.IssueId(commit.Message())
 	if issueId == "" {
 		slog.Warn("commit message does not contain issue jira id of the project", "commit", commit)

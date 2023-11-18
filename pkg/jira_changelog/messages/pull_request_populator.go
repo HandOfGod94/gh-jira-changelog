@@ -15,7 +15,7 @@ import (
 )
 
 var _ Populator = &pullRequestPopulator{}
-var _ Message = &PullRequest{}
+var _ Messager = &PullRequest{}
 
 var prRegexPattern = `\* (?P<title>.+) by @(?P<author>\S+) in (?P<url>\S+)`
 
@@ -62,13 +62,13 @@ func NewPullRequestPopulator(fromRef, toRef, repoURL string) (Populator, error) 
 	}, nil
 }
 
-func (p *pullRequestPopulator) Populate(ctx context.Context) ([]Message, error) {
+func (p *pullRequestPopulator) Populate(ctx context.Context) ([]Messager, error) {
 	pullRequests, err := p.PullRequests(ctx)
 	if err != nil {
-		return []Message{}, err
+		return []Messager{}, err
 	}
 
-	messages := lo.Map(pullRequests, func(pullRequest PullRequest, i int) Message { return pullRequest })
+	messages := lo.Map(pullRequests, func(pullRequest PullRequest, i int) Messager { return pullRequest })
 	return messages, nil
 }
 

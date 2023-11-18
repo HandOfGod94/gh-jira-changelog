@@ -66,7 +66,7 @@ gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 		defer cancel()
 
 		changelog := jira_changelog.NewGenerator(
-			jira.NewClient(jira.NewContext(jira.Options{
+			jira.NewClient(jira.NewClientOptions(jira.Options{
 				jira.BaseURL:  viper.GetString("base_url"),
 				jira.ApiToken: viper.GetString("api_token"),
 				jira.User:     viper.GetString("email_id"),
@@ -77,8 +77,7 @@ gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 			viper.GetString("repo_url"),
 		)
 
-		slog.Info("Generating changelog", "JiraConfig", changelog.JiraConfig,
-			"From", fromRef, "To", toRef, "repoURL", viper.GetString("repo_url"))
+		slog.Info("Generating changelog", "From", fromRef, "To", toRef, "repoURL", viper.GetString("repo_url"))
 		changelog.Generate(ctx).Render(writer(writeTo))
 
 		return nil

@@ -6,12 +6,12 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-type Message interface {
+type Messager interface {
 	Message() string
 }
 
 type Populator interface {
-	Populate(ctx context.Context) ([]Message, error)
+	Populate(ctx context.Context) ([]Messager, error)
 }
 
 func NewCommitOrPRPopualtor(usePR bool, fromRef, toRef, repoURL string) (Populator, error) {

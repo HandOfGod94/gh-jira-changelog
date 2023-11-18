@@ -10,7 +10,7 @@ import (
 )
 
 var _ Populator = &commitPopulator{}
-var _ Message = &Commit{}
+var _ Messager = &Commit{}
 
 type Commit struct {
 	Summary string
@@ -35,7 +35,7 @@ func NewCommitPopulator(fromRef, toRef string) (Populator, error) {
 	return cpw, nil
 }
 
-func (cpw *commitPopulator) Populate(ctx context.Context) ([]Message, error) {
+func (cpw *commitPopulator) Populate(ctx context.Context) ([]Messager, error) {
 	gitOutput, err := execGitLog(ctx, cpw.fromRef, cpw.toRef)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute git log. %w", err)
@@ -46,7 +46,7 @@ func (cpw *commitPopulator) Populate(ctx context.Context) ([]Message, error) {
 		return nil, fmt.Errorf("failed to parse output. %w", err)
 	}
 
-	messages := lo.Map(commits, func(commit Commit, i int) Message { return commit })
+	messages := lo.Map(commits, func(commit Commit, i int) Messager { return commit })
 	return messages, nil
 }
 
