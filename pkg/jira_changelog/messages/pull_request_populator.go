@@ -146,29 +146,33 @@ func parsePullRequestMessage(line string) (PullRequest, error) {
 }
 
 func repoOwner(repoURL string) (string, error) {
-	url, err := giturls.Parse(repoURL)
+	path, err := repoPath(repoURL)
 	if err != nil {
-		return "", fmt.Errorf("error parsing repo url: %w", err)
-	}
-
-	path := strings.Split(url.Path, "/")
-	if len(path) < 2 {
-		return "", fmt.Errorf("invalid repo url: %s", repoURL)
+		return "", err
 	}
 
 	return path[len(path)-2], nil
 }
 
 func repoName(repoURL string) (string, error) {
+	path, err := repoPath(repoURL)
+	if err != nil {
+		return "", err
+	}
+
+	return path[len(path)-1], nil
+}
+
+func repoPath(repoURL string) ([]string, error) {
 	url, err := giturls.Parse(repoURL)
 	if err != nil {
-		return "", fmt.Errorf("error parsing repo url: %w", err)
+		return []string{}, fmt.Errorf("error parsing repo url: %w", err)
 	}
 
 	path := strings.Split(url.Path, "/")
 	if len(path) < 2 {
-		return "", fmt.Errorf("invalid repo url: %s", repoURL)
+		return []string{}, fmt.Errorf("invalid repo url: %s", repoURL)
 	}
 
-	return path[len(path)-1], nil
+	return path, nil
 }
