@@ -5,12 +5,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"regexp"
 	"strings"
 
 	"github.com/cli/go-gh/v2/pkg/api"
 	"github.com/samber/lo"
-	giturls "github.com/whilp/git-urls"
 	"golang.org/x/exp/slog"
 )
 
@@ -151,7 +151,7 @@ func repoOwner(repoURL string) (string, error) {
 		return "", err
 	}
 
-	return path[len(path)-2], nil
+	return path[0], nil
 }
 
 func repoName(repoURL string) (string, error) {
@@ -160,19 +160,14 @@ func repoName(repoURL string) (string, error) {
 		return "", err
 	}
 
-	return path[len(path)-1], nil
+	return path[1], nil
 }
 
 func repoPath(repoURL string) ([]string, error) {
-	url, err := giturls.Parse(repoURL)
+	url, err := url.Parse(repoURL)
 	if err != nil {
 		return []string{}, fmt.Errorf("error parsing repo url: %w", err)
 	}
 
-	path := strings.Split(url.Path, "/")
-	if len(path) < 2 {
-		return []string{}, fmt.Errorf("invalid repo url: %s", repoURL)
-	}
-
-	return path, nil
+	return strings.Split(url.Path, "/"), nil
 }

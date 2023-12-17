@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog"
+	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/git"
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -74,7 +75,7 @@ gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 			usePR,
 			fromRef,
 			toRef,
-			viper.GetString("repo_url"),
+			repoUrl(ctx),
 		)
 
 		slog.Info("Generating changelog", "From", fromRef, "To", toRef, "repoURL", viper.GetString("repo_url"))
@@ -110,4 +111,21 @@ func init() {
 	generateCmd.MarkFlagRequired("from")
 
 	rootCmd.AddCommand(generateCmd)
+}
+
+func repoUrl(ctx context.Context) string {
+	url := viper.GetString("repo_url")
+	if url != "" {
+		return url
+	}
+
+	url, err := git.CurrentRepoURL(ctx)
+	if err != nil {
+		slog.Error("failed to fetch current repo url", err)
+		return ""
+	}
+
+	slog.Debug("Current repo URL", "url", url)
+
+	return url
 }
