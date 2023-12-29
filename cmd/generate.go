@@ -66,6 +66,7 @@ gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 		ctx, cancel := context.WithTimeout(context.Background(), DefaultTimeout)
 		defer cancel()
 
+		repoURL := repoURL(ctx)
 		changelog := jira_changelog.NewGenerator(
 			jira.NewClient(jira.NewClientOptions(jira.Options{
 				jira.BaseURL:  viper.GetString("base_url"),
@@ -75,10 +76,10 @@ gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 			usePR,
 			fromRef,
 			toRef,
-			repoUrl(ctx),
+			repoURL,
 		)
 
-		slog.Info("Generating changelog", "From", fromRef, "To", toRef, "repoURL", viper.GetString("repo_url"))
+		slog.Info("Generating changelog", "From", fromRef, "To", toRef, "repoURL", repoURL)
 		changelog.Generate(ctx).Render(writer(writeTo))
 
 		return nil
@@ -113,7 +114,7 @@ func init() {
 	rootCmd.AddCommand(generateCmd)
 }
 
-func repoUrl(ctx context.Context) string {
+func repoURL(ctx context.Context) string {
 	url := viper.GetString("repo_url")
 	if url != "" {
 		return url

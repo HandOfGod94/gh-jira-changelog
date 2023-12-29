@@ -91,7 +91,13 @@ func (p *pullRequestPopulator) PullRequests(ctx context.Context) ([]PullRequest,
 
 	slog.Debug("fetching changelog from github")
 
-	err = p.apiClient.Post(fmt.Sprintf("repos/%s/%s/releases/generate-notes", p.repoOwner, p.repoName), bytes.NewBuffer(requestBody), &response)
+	requestUrl, err := url.JoinPath("repos", p.repoOwner, p.repoName, "releases", "generate-notes")
+	if err != nil {
+		slog.Error("failed to create requrest url", "error", err)
+		return []PullRequest{}, err
+	}
+
+	err = p.apiClient.Post(requestUrl, bytes.NewBuffer(requestBody), &response)
 	if err != nil {
 		return []PullRequest{}, err
 	}
@@ -169,5 +175,8 @@ func repoPath(repoURL string) ([]string, error) {
 		return []string{}, fmt.Errorf("error parsing repo url: %w", err)
 	}
 
-	return strings.Split(url.Path, "/"), nil
+	paths := strings.Split(url.Path, "/")
+	paths = lo.Filter(paths, func(path string, i int) bool { return path != "" })
+
+	return paths, nil
 }

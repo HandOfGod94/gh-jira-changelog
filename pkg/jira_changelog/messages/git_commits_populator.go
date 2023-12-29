@@ -3,9 +3,9 @@ package messages
 import (
 	"context"
 	"fmt"
-	"os/exec"
 	"time"
 
+	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/git"
 	"github.com/samber/lo"
 )
 
@@ -51,12 +51,11 @@ func (cpw *commitPopulator) Populate(ctx context.Context) ([]Messager, error) {
 }
 
 func execGitLog(ctx context.Context, fromRef, toRef string) (GitOutput, error) {
-	cmd := exec.CommandContext(ctx, "git", "log", "--decorate-refs-exclude=refs/*", "--pretty=(%ct) {%h} %d %s", "--no-merges", fromRef+".."+toRef)
-	stdout, err := cmd.Output()
+	resultBytes, err := git.GitLogCommand(ctx, fromRef, toRef)
 	if err != nil {
 		return "", fmt.Errorf("failed to execute git command: %v", err)
 	}
 
-	result := string(stdout)
+	result := string(resultBytes)
 	return GitOutput(result), nil
 }
