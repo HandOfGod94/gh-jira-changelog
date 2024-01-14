@@ -19,4 +19,3 @@ func TestRepoPath_WhenRepoURLIsInvalid(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, []string{"foo"}, result)
 }
-

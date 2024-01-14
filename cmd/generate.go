@@ -68,23 +68,27 @@ gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 		defer cancel()
 
 		repoURL := repoURL(ctx)
-		var populator messages.Populator
-		if usePR {
-			populator, err = messages.NewPullRequestPopulator(fromRef, toRef, repoURL)
-		} else {
-			populator, err = messages.NewCommitPopulator(fromRef, toRef)
-		}
-
 		changelog := jira_changelog.Generator{
 			Client: jira.NewClient(jira.NewClientOptions(jira.Options{
 				jira.BaseURL:  viper.GetString("base_url"),
 				jira.ApiToken: viper.GetString("api_token"),
 				jira.User:     viper.GetString("email_id"),
 			})),
-			Populator: populator,
-			FromRef:   fromRef,
-			ToRef:     toRef,
-			RepoURL:   repoURL,
+			Populator: func() (populator messages.Populator) {
+				if usePR {
+					populator, err = messages.NewPullRequestPopulator(fromRef, toRef, repoURL)
+				} else {
+					populator, err = messages.NewCommitPopulator(fromRef, toRef)
+				}
+				return
+			}(),
+			FromRef: fromRef,
+			ToRef:   toRef,
+			RepoURL: repoURL,
+		}
+
+		if err != nil {
+			return err
 		}
 
 		slog.Info("Generating changelog", "From", fromRef, "To", toRef, "repoURL", repoURL)
