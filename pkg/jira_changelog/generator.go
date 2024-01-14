@@ -10,27 +10,15 @@ import (
 )
 
 type Generator struct {
-	fromRef   string
-	toRef     string
-	repoURL   string
-	client    jira.Client
-	populator messages.Populator
-}
-
-func NewGenerator(client jira.Client, populator messages.Populator, fromRef, toRef, repoURL string) *Generator {
-	g := &Generator{
-		fromRef:   fromRef,
-		toRef:     toRef,
-		repoURL:   repoURL,
-		client:    client,
-		populator: populator,
-	}
-
-	return g
+	FromRef   string
+	ToRef     string
+	RepoURL   string
+	Client    jira.Client
+	Populator messages.Populator
 }
 
 func (c *Generator) Generate(ctx context.Context) *Changelog {
-	commits, err := c.populator.Populate(ctx)
+	commits, err := c.Populator.Populate(ctx)
 	panicIfErr(err)
 
 	issues, err := c.fetchJiraIssues(commits)
@@ -40,7 +28,7 @@ func (c *Generator) Generate(ctx context.Context) *Changelog {
 
 	slog.Debug("Total epics", "count", len(issuesByEpic))
 
-	return NewChangelog(c.fromRef, c.toRef, c.repoURL, issuesByEpic)
+	return NewChangelog(c.FromRef, c.ToRef, c.RepoURL, issuesByEpic)
 }
 
 func (c *Generator) fetchJiraIssues(commits []messages.Messager) ([]jira.Issue, error) {
@@ -67,7 +55,7 @@ func (c *Generator) fetchJiraIssue(commit messages.Messager) (jira.Issue, error)
 		return jira.NewIssue("", commit.Message(), "done", ""), nil
 	}
 
-	issue, err := c.client.FetchIssue(string(issueId))
+	issue, err := c.Client.FetchIssue(string(issueId))
 	if err != nil {
 		slog.Warn("failed to fetch jira issue", "commit", commit)
 		return jira.NewIssue("", commit.Message(), "done", ""), nil

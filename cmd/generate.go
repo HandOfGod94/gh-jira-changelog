@@ -75,17 +75,17 @@ gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 			populator, err = messages.NewCommitPopulator(fromRef, toRef)
 		}
 
-		changelog := jira_changelog.NewGenerator(
-			jira.NewClient(jira.NewClientOptions(jira.Options{
+		changelog := jira_changelog.Generator{
+			Client: jira.NewClient(jira.NewClientOptions(jira.Options{
 				jira.BaseURL:  viper.GetString("base_url"),
 				jira.ApiToken: viper.GetString("api_token"),
 				jira.User:     viper.GetString("email_id"),
 			})),
-			populator,
-			fromRef,
-			toRef,
-			repoURL,
-		)
+			Populator: populator,
+			FromRef:   fromRef,
+			ToRef:     toRef,
+			RepoURL:   repoURL,
+		}
 
 		slog.Info("Generating changelog", "From", fromRef, "To", toRef, "repoURL", repoURL)
 		changelog.Generate(ctx).Render(writer(writeTo))
