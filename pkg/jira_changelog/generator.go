@@ -10,30 +10,27 @@ import (
 )
 
 type Generator struct {
-	fromRef string
-	toRef   string
-	repoURL string
-	client  jira.Client
-	usePR   bool
+	fromRef   string
+	toRef     string
+	repoURL   string
+	client    jira.Client
+	populator messages.Populator
 }
 
-func NewGenerator(client jira.Client, usePR bool, fromRef, toRef, repoURL string) *Generator {
+func NewGenerator(client jira.Client, populator messages.Populator, fromRef, toRef, repoURL string) *Generator {
 	g := &Generator{
-		fromRef: fromRef,
-		toRef:   toRef,
-		repoURL: repoURL,
-		client:  client,
-		usePR:   usePR,
+		fromRef:   fromRef,
+		toRef:     toRef,
+		repoURL:   repoURL,
+		client:    client,
+		populator: populator,
 	}
 
 	return g
 }
 
 func (c *Generator) Generate(ctx context.Context) *Changelog {
-	populator, err := messages.NewCommitOrPRPopualtor(c.usePR, c.fromRef, c.toRef, c.repoURL)
-	panicIfErr(err)
-
-	commits, err := populator.Populate(ctx)
+	commits, err := c.populator.Populate(ctx)
 	panicIfErr(err)
 
 	issues, err := c.fetchJiraIssues(commits)

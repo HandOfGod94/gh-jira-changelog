@@ -1,10 +1,6 @@
 package messages
 
-import (
-	"context"
-
-	"golang.org/x/exp/slog"
-)
+import "context"
 
 type Messager interface {
 	Message() string
@@ -14,12 +10,8 @@ type Populator interface {
 	Populate(ctx context.Context) ([]Messager, error)
 }
 
-func NewCommitOrPRPopualtor(usePR bool, fromRef, toRef, repoURL string) (Populator, error) {
-	if usePR {
-		slog.Debug("using github PR titles to generate changelog")
-		return NewPullRequestPopulator(fromRef, toRef, repoURL)
-	} else {
-		slog.Debug("using commit messages to generate changelog")
-		return NewCommitPopulator(fromRef, toRef)
-	}
+type NoopPopulator struct{}
+
+func (e *NoopPopulator) Populate(ctx context.Context) ([]Messager, error) {
+	return []Messager{}, nil
 }

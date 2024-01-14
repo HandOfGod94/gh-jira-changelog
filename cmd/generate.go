@@ -10,6 +10,7 @@ import (
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog"
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/git"
 	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/jira"
+	"github.com/handofgod94/gh-jira-changelog/pkg/jira_changelog/messages"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/exp/slog"
@@ -62,18 +63,25 @@ gh jira-changelog generate --config="<path-to-config-file>.yaml" --from="v0.1.0"
 
 		return nil
 	},
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
 		ctx, cancel := context.WithTimeout(context.Background(), DefaultTimeout)
 		defer cancel()
 
 		repoURL := repoURL(ctx)
+		var populator messages.Populator
+		if usePR {
+			populator, err = messages.NewPullRequestPopulator(fromRef, toRef, repoURL)
+		} else {
+			populator, err = messages.NewCommitPopulator(fromRef, toRef)
+		}
+
 		changelog := jira_changelog.NewGenerator(
 			jira.NewClient(jira.NewClientOptions(jira.Options{
 				jira.BaseURL:  viper.GetString("base_url"),
 				jira.ApiToken: viper.GetString("api_token"),
 				jira.User:     viper.GetString("email_id"),
 			})),
-			usePR,
+			populator,
 			fromRef,
 			toRef,
 			repoURL,

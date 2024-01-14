@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFetchJiraIssuesEvent(t *testing.T) {
+func TestFetchJiraIssues(t *testing.T) {
 	commits := []messages.Commit{
 		{Time: time.Now(), Summary: "[TEST-1234] commit message1", Sha: "3245vw"},
 		{Time: time.Now(), Summary: "[TEST-4546] commit message sample1", Sha: "3245vw"},
@@ -35,7 +35,7 @@ func TestFetchJiraIssuesEvent(t *testing.T) {
 	mockedClient.On("FetchIssue", "TEST-4546").Return(want[1], nil).Twice()
 	mockedClient.On("FetchIssue", "TEST-12345").Return(want[2], nil)
 
-	generator := NewGenerator(jira.NewClient(jira.NewClientOptions(nil)), false, "fromRef", "toRef", "http://example-repo.com")
+	generator := NewGenerator(jira.NewClient(jira.NewClientOptions(nil)), &messages.NoopPopulator{}, "fromRef", "toRef", "http://example-repo.com")
 	generator.client = mockedClient
 
 	changeMessages := lo.Map(commits, func(commit messages.Commit, i int) messages.Messager { return commit })
