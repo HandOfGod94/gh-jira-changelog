@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/cli/go-gh/v2 v2.4.0
 	github.com/fatih/color v1.15.0
-	github.com/go-resty/resty/v2 v2.10.0
+	github.com/go-resty/resty/v2 v2.11.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/qmuntal/stateless v1.6.7
 	github.com/samber/lo v1.38.1
