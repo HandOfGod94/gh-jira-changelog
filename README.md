@@ -1,6 +1,10 @@
 # gh-jira-changelog
 
+<p align="center">
+<img alt="image-generator-logo.png" width="300" src="./images/changelog-generator-logo.png" /><br/>
 `gh` cli plugin to generate changelog from jira
+</p>
+
 
 ## Content
   * [Installation](#installation)
