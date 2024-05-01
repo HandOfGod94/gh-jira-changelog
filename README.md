@@ -12,6 +12,7 @@
     * [MacOS using `homebrew`](#macos-using-`homebrew`)
     * [Go Toolchain](#go-toolchain)
   * [Verify installation](#verify-installation)
+  * [Quickstart](#quickstart)
   * [Usage](#usage)
     * [Generating Changelog](#generating-changelog)
 
@@ -40,8 +41,19 @@ The go binary will be installed in `$GOPATH/bin`
 
 `$ gh-jira-changelog version`
 ```
-v0.3.2
+v0.4.0
 ```
+
+### Quickstart
+
+* Install github cli as documented [here](https://cli.github.com/)
+* Install gh extension using `gh extension install handofgod94/gh-jira-changelog`
+* Login to github: `gh auth login`
+* Login to jira: `gh jira-changelog auth login`
+* Open repo, for which you want to generate changelog using `cd`
+* Run command: `gh jira-changelog generate --from="v2.18.0" --to="v2.19.0" --use_pr`
+
+> Note: The auth token of jira expires every 24 hours. Relogin again to fetch info from jira
 
 ### Usage
 
