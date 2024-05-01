@@ -44,8 +44,8 @@ func NewAuthenticator() *oauthAuthenticator {
 	a := &oauthAuthenticator{}
 
 	a.conf = &oauth2.Config{
-		ClientID:     "OOGf9PTJL0hGGC5hWD17G6OkiGKjO0FG",
-		ClientSecret: "ATOAhihA9MN3TOWAJEC4DxxPZMxGyjmA_mH8rUtSGXRIoUP6WQ3UvjCk5Mtx9TUBH6JF089B37D6",
+		ClientID:     "jb3XcMDn5R7xO6TJjeOCQntdq5Y5yWMa",
+		ClientSecret: "ATOAtFraLSsgQ6VzugBqxiH3lZ_RaDLQTF-3AtWHuDZsj76CHQ5IRz_vBolUrJrqRMTlF150AB7D",
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  "https://auth.atlassian.com/authorize",
 			TokenURL: "https://auth.atlassian.com/oauth/token",
